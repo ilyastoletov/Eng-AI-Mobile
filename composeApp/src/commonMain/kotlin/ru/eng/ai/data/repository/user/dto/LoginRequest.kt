@@ -1,0 +1,9 @@
+package ru.eng.ai.data.repository.user.dto
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LoginRequest(
+    val username: String,
+    val password: String
+)
