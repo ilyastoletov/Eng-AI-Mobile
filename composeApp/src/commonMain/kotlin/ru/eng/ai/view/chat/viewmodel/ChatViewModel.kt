@@ -4,28 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
+import org.orbitmvi.orbit.syntax.Syntax
+import ru.eng.ai.data.repository.chat.ChatRepository
 import ru.eng.ai.data.repository.user.UserRepository
 import ru.eng.ai.model.Character
 import ru.eng.ai.model.Message
-import ru.eng.ai.tool.Logger
 import ru.eng.ai.tool.getDeviceIdentifier
 
 class ChatViewModel(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val chatRepository: ChatRepository
 ) : ContainerHost<ChatState, Nothing>, ViewModel() {
-
-    private val messageStorage = listOf(
-        Message(text = "I think perfect topic for today is a trip to Rome. What do you think about this city?", sendingTime = "11:52", isOwn = false),
-        Message(text = "Okay, let's just chat about something", sendingTime = "20:00", isOwn = false),
-        Message(text = "As an artificial intelligence model I cannot provide you with some topics to chat with me about. Choose something you want.", sendingTime = "14:11", isOwn = false),
-        Message(text = "We can talk about astrophysics and catholic churches. Also I am currently studying quantum mechanics in my university and since that very curious about this topic", sendingTime = "12:01", isOwn = false),
-    )
 
     override val container: Container<ChatState, Nothing> = viewModelScope.container(ChatState())
 
@@ -40,33 +36,73 @@ class ChatViewModel(
     private fun registerOrLogin() = intent {
         withContext(Dispatchers.IO) {
             val deviceId = getDeviceIdentifier()
-            Logger.i("Device_ID", deviceId)
             userRepository.registerOrLoginWithDeviceId(deviceId)
         }
     }
 
-    private fun sendMessage(text: String) = intent {
-        viewModelScope.launch {
-            reduce {
-                val updatedMessages = state.messages.toMutableList()
-                    .apply { add(Message(text = text, sendingTime = "14:36", isOwn = true)) }
-                state.copy(messages = updatedMessages, fastReplyOptions = emptyList())
-            }
-            delay(1600)
-            reduce {
-                val updatedMessages = state.messages.toMutableList().apply {
-                    add(messageStorage.shuffled().first())
+    init {
+        loadSavedMessages()
+        chatRepository.incomingMessages
+            .onEach { messageResult ->
+                intent {
+                    messageResult.fold(
+                        onSuccess = { message ->
+                            chatRepository.saveMessage(state.selectedCharacter, message)
+                            appendMessage(message)
+                        },
+                        onFailure = { error ->
+                            reduce { state.copy(snackbarMessage = error.message) }
+                        }
+                    )
                 }
-                state.copy(messages = updatedMessages)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun loadSavedMessages() = intent {
+        viewModelScope.launch(Dispatchers.IO) {
+            val messages = chatRepository.getSavedMessages(state.selectedCharacter)
+            if (messages.isNotEmpty()) {
+                reduce {
+                    state.copy(
+                        messages = messages,
+                        fastReplyOptions = emptyList()
+                    )
+                }
             }
         }
     }
 
+    private fun sendMessage(text: String) = intent {
+        viewModelScope.launch(Dispatchers.IO) {
+            val sentMessage = chatRepository.sendMessage(state.selectedCharacter, text)
+            appendMessage(sentMessage)
+        }
+    }
+
     private fun changeCharacter(newCharacter: Character) = intent {
+        viewModelScope.launch(Dispatchers.IO) {
+            val savedMessages = chatRepository.getSavedMessages(newCharacter)
+            val fastReplies =
+                if (savedMessages.isEmpty()) ChatState.defaultFastReplies else emptyList()
+
+            reduce {
+                state.copy(
+                    selectedCharacter = newCharacter,
+                    messages = savedMessages,
+                    fastReplyOptions = fastReplies
+                )
+            }
+        }
+    }
+
+    private suspend fun Syntax<ChatState, Nothing>.appendMessage(message: Message) {
         reduce {
+            val mutableMessages = state.messages.toMutableList()
+            mutableMessages.add(message)
             state.copy(
-                selectedCharacter = newCharacter,
-                messages = emptyList()
+                messages = mutableMessages,
+                fastReplyOptions = emptyList()
             )
         }
     }

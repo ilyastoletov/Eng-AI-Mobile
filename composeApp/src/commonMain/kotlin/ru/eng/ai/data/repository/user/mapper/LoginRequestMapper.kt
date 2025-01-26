@@ -4,7 +4,7 @@ import ru.eng.ai.data.repository.user.dto.LoginRequest
 
 internal fun String.toLoginRequest(): LoginRequest {
     return LoginRequest(
-        username = "ilya",
+        username = this,
         password = this
     )
 }

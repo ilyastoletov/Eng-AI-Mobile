@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,8 +65,11 @@ private fun Screen(
         mutableStateOf(false)
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.ime),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             ChatTopBar(
                 character = state.selectedCharacter,
@@ -93,6 +98,12 @@ private fun Screen(
             onDismiss = { characterChangeBottomSheetExpanded = false },
             onSelect = { onIntent.invoke(ChatAction.SelectCharacter(it)) }
         )
+    }
+
+    LaunchedEffect(state.snackbarMessage) {
+        if (state.snackbarMessage != null) {
+            snackbarHostState.showSnackbar(state.snackbarMessage)
+        }
     }
 }
 

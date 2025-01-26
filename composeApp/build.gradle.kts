@@ -52,12 +52,15 @@ kotlin {
             implementation(libs.kodein.di)
 
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.websockets)
             implementation(libs.ktor.client.contentNegotiation)
             implementation(libs.ktor.client.serialization.json)
             implementation(libs.ktor.client.logging)
 
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.room.sqliteBundled)
+
+            implementation(libs.kotlinx.datetime)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

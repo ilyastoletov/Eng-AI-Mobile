@@ -7,6 +7,9 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -31,6 +34,7 @@ internal class KtorClient {
             level = LogLevel.ALL
             logger = Logger.SIMPLE
         }
+        install(WebSockets)
     }
 
     suspend fun get(url: String, block: HttpRequestBuilder.() -> Unit): Result<HttpResponse> =
@@ -38,5 +42,8 @@ internal class KtorClient {
 
     suspend fun post(url: String, block: HttpRequestBuilder.() -> Unit): Result<HttpResponse> =
         runCatching { client.post(url, block) }
+
+    suspend fun openWebsocketSession(urlString: String): DefaultClientWebSocketSession =
+        client.webSocketSession(urlString = urlString)
 
 }

@@ -17,7 +17,12 @@ private val di = DI {
 @Composable
 fun EngApp() {
     EngCustomTheme {
-        val chatViewModel by di.newInstance { ChatViewModel(userRepository = instance()) }
+        val chatViewModel by di.newInstance {
+            ChatViewModel(
+                userRepository = instance(),
+                chatRepository = instance()
+            )
+        }
 
         ChatScreen(
             viewModel = viewModel { chatViewModel }

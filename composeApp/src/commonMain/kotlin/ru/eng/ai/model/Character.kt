@@ -10,7 +10,7 @@ sealed class Character(
     val name: String,
     val shortDescription: String,
     val description: String,
-    val avatarResource: DrawableResource
+    val avatarResource: DrawableResource,
 ) {
 
     data object Traveler : Character(
