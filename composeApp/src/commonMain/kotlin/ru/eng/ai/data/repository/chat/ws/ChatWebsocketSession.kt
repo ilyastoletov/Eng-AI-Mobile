@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.eng.ai.data.network.KtorClient
 import ru.eng.ai.data.network.WebSocketSession
+import ru.eng.ai.data.repository.chat.mapper.getRandomUUIDString
 import ru.eng.ai.model.Message
 import ru.eng.ai.tool.getCurrentTimeAsClock
 import kotlin.coroutines.cancellation.CancellationException
@@ -41,6 +42,7 @@ internal class ChatWebsocketSession(private val client: KtorClient) : WebSocketS
     private fun Frame.toMessageResult(): Result<Message> =
         decodeToStringResult().mapCatching { text ->
             Message(
+                id = getRandomUUIDString(),
                 text = text,
                 sendingTime = getCurrentTimeAsClock(),
                 isOwn = false

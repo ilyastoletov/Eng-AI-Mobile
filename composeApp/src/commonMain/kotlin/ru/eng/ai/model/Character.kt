@@ -21,16 +21,16 @@ sealed class Character(
     )
 
     data object Scientist : Character(
-        name = "Мисс Дейвис",
+        name = "Бренда",
         shortDescription = "Профессор",
-        description = "Бренда Дейвис профессор в Оксфордском университете. Имеет научных степеней, с легкостью побеседует на научные темы.",
+        description = "Бренда Дейвис профессор лингвистики в университете Оксфорда. Специалист по английскому языку, поможет вам практиковать и лексику, и грамматику.",
         avatarResource = Res.drawable.scientist_avatar
     )
 
     data object NativeSpeaker : Character(
         name = "Тайлер",
         shortDescription = "Носитель языка",
-        description = "Дружелюбный житель Калифорнии. Быстро адаптируется к стилю общения собеседника, часто использует сленги в разговоре.",
+        description = "Дружелюбный житель Калифорнии, любит общатся с иностранцами. Может поговорить с вами на тему любимых увлечений, да и в целом о жизни.",
         avatarResource = Res.drawable.native_speaker_avatar
     )
 

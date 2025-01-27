@@ -8,10 +8,11 @@ import androidx.room.PrimaryKey
     tableName = "messages"
 )
 data class MessageEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val id: String,
     val text: String,
     @ColumnInfo("is_own") val isOwn: Boolean,
+    @ColumnInfo("is_pinned") val isPinned: Boolean,
     @ColumnInfo("sending_time") val sendingTime: String,
     @ColumnInfo("character_name") val characterName: String,
     @ColumnInfo("expiration_timestamp") val expirationTimestamp: Long,

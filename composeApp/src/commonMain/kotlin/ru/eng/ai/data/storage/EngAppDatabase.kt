@@ -9,7 +9,7 @@ import ru.eng.ai.data.storage.entity.TokenEntity
 
 @Database(
     entities = [TokenEntity::class, MessageEntity::class],
-    version = 2
+    version = 4
 )
 abstract class EngAppDatabase : RoomDatabase() {
 

@@ -3,6 +3,7 @@ package ru.eng.ai.data.repository.chat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 import ru.eng.ai.data.network.WebSocketSession
+import ru.eng.ai.data.repository.chat.mapper.getRandomUUIDString
 import ru.eng.ai.data.repository.chat.mapper.toEntity
 import ru.eng.ai.data.repository.chat.mapper.toMessage
 import ru.eng.ai.data.storage.dao.MessageDao
@@ -16,6 +17,7 @@ interface ChatRepository {
     suspend fun getSavedMessages(character: Character): List<Message>
     suspend fun sendMessage(character: Character, text: String): Message
     suspend fun saveMessage(character: Character, message: Message)
+    suspend fun togglePinOnMessage(messageId: String): Result<Unit>
 }
 
 internal class ChatRepositoryImpl(
@@ -43,7 +45,7 @@ internal class ChatRepositoryImpl(
     override suspend fun sendMessage(character: Character, text: String): Message {
         val authToken = tokenDao.getToken()?.token.orEmpty()
         val composedMessage = "$authToken:${character.getInternalName()}:$text"
-        val message = Message(text = text, sendingTime = getCurrentTimeAsClock(), isOwn = true)
+        val message = buildOwnMessage(text)
         webSocketSession.send(composedMessage)
         saveMessage(character, message)
         return message
@@ -54,11 +56,25 @@ internal class ChatRepositoryImpl(
         messagesDao.putMessage(entity)
     }
 
+    override suspend fun togglePinOnMessage(messageId: String): Result<Unit> {
+        return runCatching { messagesDao.togglePinOnMessage(messageId) }
+    }
+
     private fun Character.getInternalName() =
          when(this) {
             Character.NativeSpeaker -> "Native Speaker"
             Character.Scientist -> "Professor"
             Character.Traveler -> "Traveler"
         }
+
+    private fun buildOwnMessage(text: String): Message {
+        return Message(
+            id = getRandomUUIDString(),
+            text = text,
+            isOwn = true,
+            sendingTime = getCurrentTimeAsClock(),
+            isPinned = false
+        )
+    }
 
 }

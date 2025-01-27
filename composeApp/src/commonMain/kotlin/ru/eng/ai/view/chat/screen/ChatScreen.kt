@@ -1,26 +1,19 @@
 package ru.eng.ai.view.chat.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,26 +21,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.eng.ai.model.Message
 import ru.eng.ai.view.chat.screen.components.ChatTopBar
 import ru.eng.ai.view.chat.screen.components.MessageBar
-import ru.eng.ai.view.chat.screen.components.SelectCharacterBottomSheet
+import ru.eng.ai.view.chat.screen.components.MessageItem
+import ru.eng.ai.view.chat.screen.bottomsheet.SelectCharacterBottomSheet
+import ru.eng.ai.view.chat.screen.components.PinnedMessagesBar
 import ru.eng.ai.view.chat.viewmodel.ChatAction
+import ru.eng.ai.view.chat.viewmodel.ChatEffect
 import ru.eng.ai.view.chat.viewmodel.ChatState
 import ru.eng.ai.view.chat.viewmodel.ChatViewModel
 import ru.eng.ai.view.theme.EngTheme
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
-    val state by viewModel.container.refCountStateFlow.collectAsState()
+    val state by viewModel.container.stateFlow.collectAsState()
+    val sideEffect by viewModel.container.sideEffectFlow.collectAsState(initial = ChatEffect.NoEffect)
     val handleIntent = remember { { intent: ChatAction -> viewModel.dispatch(intent) } }
 
     Screen(
         state = state,
+        sideEffect = sideEffect,
         onIntent = handleIntent
     )
 
@@ -59,10 +55,14 @@ fun ChatScreen(viewModel: ChatViewModel) {
 @Composable
 private fun Screen(
     state: ChatState,
+    sideEffect: ChatEffect,
     onIntent: (ChatAction) -> Unit
 ) {
     var characterChangeBottomSheetExpanded by remember {
         mutableStateOf(false)
+    }
+    val pinnedMessagesBarEnabled = remember(state.messages) {
+        state.messages.any { it.isPinned }
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -71,10 +71,17 @@ private fun Screen(
         modifier = Modifier.windowInsetsPadding(WindowInsets.ime),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            ChatTopBar(
-                character = state.selectedCharacter,
-                onClickChangeCharacter = { characterChangeBottomSheetExpanded = true },
-            )
+            Column {
+                ChatTopBar(
+                    character = state.selectedCharacter,
+                    onClickChangeCharacter = { characterChangeBottomSheetExpanded = true },
+                )
+                if (pinnedMessagesBarEnabled) {
+                    PinnedMessagesBar(
+                        messages = state.messages
+                    )
+                }
+            }
         },
         bottomBar = {
             MessageBar(
@@ -88,7 +95,9 @@ private fun Screen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(scaffoldPadding),
-            messages = state.messages
+            messages = state.messages,
+            onCopyMessage = { text -> onIntent(ChatAction.CopyMessageText(text)) },
+            onPinMessage = { messageId -> onIntent(ChatAction.PinMessage(messageId)) }
         )
     }
 
@@ -100,9 +109,12 @@ private fun Screen(
         )
     }
 
-    LaunchedEffect(state.snackbarMessage) {
-        if (state.snackbarMessage != null) {
-            snackbarHostState.showSnackbar(state.snackbarMessage)
+    LaunchedEffect(sideEffect) {
+        when(sideEffect) {
+            is ChatEffect.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(message = sideEffect.message)
+            }
+            is ChatEffect.NoEffect -> {}
         }
     }
 }
@@ -110,7 +122,9 @@ private fun Screen(
 @Composable
 private fun MessagesList(
     modifier: Modifier = Modifier,
-    messages: List<Message>
+    messages: List<Message>,
+    onCopyMessage: (text: String) -> Unit,
+    onPinMessage: (id: String) -> Unit
 ) {
     val lastMessageIndex = remember(messages.size) {
         messages.lastIndex.coerceAtLeast(0)
@@ -137,49 +151,11 @@ private fun MessagesList(
             MessageItem(
                 text = item.text,
                 sendingTime = item.sendingTime,
-                isOwn = item.isOwn
+                isOwn = item.isOwn,
+                isPinned = item.isPinned,
+                onCopy = { onCopyMessage(item.text) },
+                onPin = { onPinMessage(item.id) }
             )
         }
-    }
-}
-
-@Composable
-private fun MessageItem(
-    text: String,
-    isOwn: Boolean,
-    sendingTime: String
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = if (isOwn) Alignment.End else Alignment.Start
-    ) {
-        Row(
-            modifier = Modifier
-                .background(
-                    color = if (isOwn) EngTheme.colors.secondary else EngTheme.colors.primary,
-                    shape = RoundedCornerShape(30.dp)
-                )
-                .padding(
-                    vertical = 8.dp,
-                    horizontal = 19.dp
-                )
-        ) {
-            Text(
-                text = text,
-                style = EngTheme.typography.medium14,
-                color = EngTheme.colors.dimSecondary,
-                modifier = Modifier
-            )
-        }
-        Spacer(
-            modifier = Modifier.height(4.dp)
-        )
-        Text(
-            text = sendingTime,
-            style = EngTheme.typography.medium12,
-            color = EngTheme.colors.dimTertiary,
-            textAlign = if (isOwn) TextAlign.End else TextAlign.Start,
-            modifier = Modifier.padding(horizontal = 19.dp)
-        )
     }
 }

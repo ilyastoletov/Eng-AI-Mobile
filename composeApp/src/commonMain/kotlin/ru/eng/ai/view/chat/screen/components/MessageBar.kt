@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,9 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import engai.composeapp.generated.resources.Res
+import engai.composeapp.generated.resources.ic_chevron_left
 import engai.composeapp.generated.resources.ic_send
 import org.jetbrains.compose.resources.painterResource
 import ru.eng.ai.view.theme.EngTheme
@@ -37,6 +42,9 @@ fun MessageBar(
     onSendMessage: (String) -> Unit,
 ) {
     var messageText by remember { mutableStateOf("") }
+
+    val fastReplyOptionsEnabled = remember(fastReplyOptions) { fastReplyOptions.isNotEmpty() }
+    var replyOptionsVisible by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -52,6 +60,9 @@ fun MessageBar(
             modifier = Modifier.fillMaxWidth(),
             text = messageText,
             onChangeText = { messageText = it },
+            enableFastReplyButton = fastReplyOptionsEnabled,
+            fastReplyOpen = replyOptionsVisible,
+            onToggleFastReply = { replyOptionsVisible = !replyOptionsVisible },
             onClickSend = {
                 if (messageText.isNotEmpty()) {
                     onSendMessage(messageText)
@@ -59,7 +70,7 @@ fun MessageBar(
                 }
             }
         )
-        if (fastReplyOptions.isNotEmpty()) {
+        if (fastReplyOptionsEnabled && replyOptionsVisible) {
             Spacer(
                 modifier = Modifier.height(28.dp)
             )
@@ -84,6 +95,9 @@ fun MessageBar(
 private fun MessageTextField(
     modifier: Modifier = Modifier,
     text: String,
+    enableFastReplyButton: Boolean,
+    fastReplyOpen: Boolean,
+    onToggleFastReply: () -> Unit,
     onChangeText: (String) -> Unit,
     onClickSend: () -> Unit
 ) {
@@ -91,7 +105,12 @@ private fun MessageTextField(
         modifier = modifier,
         value = text,
         onValueChange = onChangeText,
-        textStyle = EngTheme.typography.medium14,
+        cursorBrush = SolidColor(EngTheme.colors.dimSecondary),
+        textStyle = EngTheme.typography.medium14
+            .copy(color = EngTheme.colors.dimSecondary),
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences
+        )
     ) { innerTextField ->
         Row(
             modifier = Modifier
@@ -102,13 +121,26 @@ private fun MessageTextField(
                 ),
             verticalAlignment = Alignment.Bottom
         ) {
+            if (enableFastReplyButton) {
+                ToggleFastReplyButton(
+                    modifier = Modifier
+                        .weight(0.15f)
+                        .padding(
+                            start = 10.dp,
+                            bottom = 6.dp,
+                            top = 6.dp
+                        ),
+                    open = fastReplyOpen,
+                    onClick = onToggleFastReply
+                )
+            }
             Box(
                 modifier = Modifier
-                    .weight(0.85f)
+                    .weight(0.7f)
                     .padding(
                         top = 14.dp,
                         bottom = 14.dp,
-                        start = 22.dp,
+                        start = 15.dp,
                         end = 12.dp
                     )
             ) {
@@ -151,6 +183,40 @@ private fun MessageTextField(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ToggleFastReplyButton(
+    modifier: Modifier,
+    open: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .size(36.dp)
+            .background(
+                color = EngTheme.colors.primary,
+                shape = CircleShape
+            )
+//            .padding(
+//                vertical = 14.dp,
+//                horizontal = 10.dp
+//            )
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.ic_chevron_left),
+            tint = EngTheme.colors.dimSecondary,
+            contentDescription = null,
+            modifier = Modifier
+                .rotate(degrees = if (open) 90f else -90f)
+        )
     }
 }
 

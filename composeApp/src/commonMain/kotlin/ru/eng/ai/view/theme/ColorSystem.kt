@@ -26,20 +26,20 @@ val lightColorSystem = ColorSystem(
     lightSecondary = Color(0xFF4B3F6E),
     tertiary = Color(0xFF725DB3),
     dimTertiary = Color(0x6631284D),
-    darkTertiary = Color(0x6C5F8D),
+    darkTertiary = Color(0xFF6C5F8D),
     background = Color(0xFF514280),
     onBackground = Color(0xFFBD3761)
 )
 
 val darkColorSystem = ColorSystem(
-    primary = Color(0x66E1DEE9),
-    primaryVariant = Color(0xFFE1DEE9),
-    secondary = Color(0xFFF2EFF6),
-    dimSecondary = Color(0xFFB6AAC7),
-    lightSecondary = Color(0xFF7B6499),
-    tertiary = Color(0xFF3E3A50),
-    dimTertiary = Color(0xFF1D1D21),
-    darkTertiary = Color(0x801D1D21),
-    background = Color(0xFF0B0A0B),
-    onBackground = Color(0x6631284D)
+    primary = Color(0xFF0B0A0B),
+    primaryVariant = Color(0xFF1D1D21),
+    secondary = Color(0xFF3E3A50),
+    dimSecondary = Color(0xFFE1DEE9),
+    lightSecondary = Color(0xFFF2EFF6),
+    tertiary = Color(0xFF7B6499),
+    dimTertiary = Color(0x73E1DEE9),
+    darkTertiary = Color(0xFF514F60),
+    background = Color(0xFFB6AAC7),
+    onBackground = Color(0xFF6D1833)
 )

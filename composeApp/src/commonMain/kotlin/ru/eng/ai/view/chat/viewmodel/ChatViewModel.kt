@@ -16,20 +16,23 @@ import ru.eng.ai.data.repository.chat.ChatRepository
 import ru.eng.ai.data.repository.user.UserRepository
 import ru.eng.ai.model.Character
 import ru.eng.ai.model.Message
+import ru.eng.ai.tool.copyText
 import ru.eng.ai.tool.getDeviceIdentifier
 
 class ChatViewModel(
     private val userRepository: UserRepository,
     private val chatRepository: ChatRepository
-) : ContainerHost<ChatState, Nothing>, ViewModel() {
+) : ContainerHost<ChatState, ChatEffect>, ViewModel() {
 
-    override val container: Container<ChatState, Nothing> = viewModelScope.container(ChatState())
+    override val container: Container<ChatState, ChatEffect> = viewModelScope.container(ChatState())
 
     fun dispatch(action: ChatAction) {
         when(action) {
             is ChatAction.RegisterOrLogin -> registerOrLogin()
-            is ChatAction.SendMessage -> sendMessage(action.text)
             is ChatAction.SelectCharacter -> changeCharacter(action.newCharacter)
+            is ChatAction.SendMessage -> sendMessage(action.text)
+            is ChatAction.CopyMessageText -> copyMessageText(action.text)
+            is ChatAction.PinMessage -> toggleMessagePin(action.messageId)
         }
     }
 
@@ -43,20 +46,21 @@ class ChatViewModel(
     init {
         loadSavedMessages()
         chatRepository.incomingMessages
-            .onEach { messageResult ->
-                intent {
-                    messageResult.fold(
-                        onSuccess = { message ->
-                            chatRepository.saveMessage(state.selectedCharacter, message)
-                            appendMessage(message)
-                        },
-                        onFailure = { error ->
-                            reduce { state.copy(snackbarMessage = error.message) }
-                        }
-                    )
-                }
-            }
+            .onEach { handleIncomingMessage(it) }
             .launchIn(viewModelScope)
+    }
+
+    private fun handleIncomingMessage(messageResult: Result<Message>) = intent {
+        messageResult.fold(
+            onSuccess = { message ->
+                chatRepository.saveMessage(state.selectedCharacter, message)
+                appendMessage(message)
+            },
+            onFailure = { error ->
+                val message = "Ошибка соединения с сервером: ${error.message}"
+                postSideEffect(ChatEffect.ShowSnackbar(message))
+            }
+        )
     }
 
     private fun loadSavedMessages() = intent {
@@ -96,7 +100,28 @@ class ChatViewModel(
         }
     }
 
-    private suspend fun Syntax<ChatState, Nothing>.appendMessage(message: Message) {
+    private fun copyMessageText(text: String) = intent {
+        copyText(text)
+        postSideEffect(ChatEffect.ShowSnackbar("Текст сообщения скопирован"))
+    }
+
+    private fun toggleMessagePin(messageId: String) = intent {
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRepository.togglePinOnMessage(messageId).fold(
+                onSuccess = {
+                    reduce {
+                        val updatedList = togglePinOnMessage(state.messages, messageId)
+                        state.copy(messages = updatedList)
+                    }
+                },
+                onFailure = { error ->
+                    postSideEffect(ChatEffect.ShowSnackbar("Ошибка закрепления: ${error.message}"))
+                }
+            )
+        }
+    }
+
+    private suspend fun Syntax<ChatState, ChatEffect>.appendMessage(message: Message) {
         reduce {
             val mutableMessages = state.messages.toMutableList()
             mutableMessages.add(message)
@@ -105,6 +130,15 @@ class ChatViewModel(
                 fastReplyOptions = emptyList()
             )
         }
+    }
+
+    private fun togglePinOnMessage(messages: List<Message>, id: String): List<Message> {
+        val mutableMessages = messages.toMutableList()
+        val message = mutableMessages.find { it.id == id } ?: return messages
+        val itemIndex = mutableMessages.indexOf(message)
+        val updatedMessage = message.copy(isPinned = !message.isPinned)
+        mutableMessages.set(itemIndex, updatedMessage)
+        return mutableMessages
     }
 
 

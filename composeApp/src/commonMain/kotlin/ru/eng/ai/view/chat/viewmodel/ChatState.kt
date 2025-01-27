@@ -7,7 +7,6 @@ data class ChatState(
     val selectedCharacter: Character = Character.Traveler,
     val messages: List<Message> = emptyList(),
     val fastReplyOptions: List<String> = defaultFastReplies,
-    val snackbarMessage: String? = null
 ) {
     companion object {
         val defaultFastReplies = listOf("Hello!", "What about can I talk with you today?")
