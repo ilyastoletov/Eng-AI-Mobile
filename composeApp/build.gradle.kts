@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.googleDevtoolsKsp)
     alias(libs.plugins.room)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebaseCrashlytics)
     kotlin("plugin.serialization") version "2.0.20"
 }
 
@@ -27,6 +30,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            export(libs.nsexception)
         }
     }
     
@@ -36,6 +40,9 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+
+            implementation(libs.yandex.appmetrica)
+            implementation(libs.google.firebase.crashlytics)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -64,6 +71,7 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            api(libs.nsexception)
         }
     }
 }
@@ -77,6 +85,10 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
+        buildConfigField("String", "API_URL", loadLocalVariable("apiUrl"))
+        buildConfigField("String", "WEBSOCKETS_URL", loadLocalVariable("websocketsUrl"))
+        buildConfigField("String", "APPMETRICA_KEY", loadLocalVariable("appmetricaKey"))
+
         applicationId = "ru.eng.ai"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
@@ -97,7 +109,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     dependencies {
@@ -112,4 +126,15 @@ dependencies {
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspIosX64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
+}
+
+fun Project.loadLocalVariable(key: String): String {
+    val localProperties = Properties()
+    val propertiesFile = project.rootProject.file("local.properties")
+    if (propertiesFile.exists()) {
+        localProperties.load(propertiesFile.inputStream())
+        return localProperties.getProperty(key)
+    } else {
+        throw GradleException("local.properties file not found")
+    }
 }

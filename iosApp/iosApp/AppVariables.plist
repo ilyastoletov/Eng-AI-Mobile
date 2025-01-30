@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>apiUrl</key>
+	<string>http://103.90.75.40:6464/api/</string>
+	<key>websocketsUrl</key>
+	<string>ws://103.90.75.40:6464/api/ws/chat</string>
+	<key>appmetricaKey</key>
+	<string>29931ecf-7109-4e63-9c6c-d772b05900dd</string>
+</dict>
+</plist>

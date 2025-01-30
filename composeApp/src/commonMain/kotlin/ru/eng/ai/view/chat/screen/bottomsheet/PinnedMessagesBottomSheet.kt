@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,12 +37,12 @@ fun PinnedMessagesBottomSheet(
         onDismissRequest = onDismiss
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 top = 0.dp,
                 start = 20.dp,
                 end = 20.dp,
-                bottom = 20.dp
+                bottom = 35.dp
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
