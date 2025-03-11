@@ -28,6 +28,7 @@ import ru.eng.ai.view.chat.screen.components.ChatTopBar
 import ru.eng.ai.view.chat.screen.components.MessageBar
 import ru.eng.ai.view.chat.screen.components.MessageItem
 import ru.eng.ai.view.chat.screen.bottomsheet.SelectCharacterBottomSheet
+import ru.eng.ai.view.chat.screen.components.LimitReachedNotice
 import ru.eng.ai.view.chat.screen.components.PinnedMessagesBar
 import ru.eng.ai.view.chat.viewmodel.ChatAction
 import ru.eng.ai.view.chat.viewmodel.ChatEffect
@@ -49,6 +50,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
     LaunchedEffect(Unit) {
         handleIntent.invoke(ChatAction.RegisterOrLogin)
+        handleIntent.invoke(ChatAction.CheckLimitReached)
     }
 }
 
@@ -84,10 +86,14 @@ private fun Screen(
             }
         },
         bottomBar = {
-            MessageBar(
-                fastReplyOptions = state.fastReplyOptions,
-                onSendMessage = { onIntent.invoke(ChatAction.SendMessage(it)) },
-            )
+            if (!state.limitReached) {
+                MessageBar(
+                    fastReplyOptions = state.fastReplyOptions,
+                    onSendMessage = { onIntent.invoke(ChatAction.SendMessage(it)) },
+                )
+            } else {
+                LimitReachedNotice()
+            }
         },
         backgroundColor = EngTheme.colors.primaryVariant
     ) { scaffoldPadding ->

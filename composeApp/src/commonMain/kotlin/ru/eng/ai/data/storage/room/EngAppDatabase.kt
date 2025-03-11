@@ -1,13 +1,13 @@
-package ru.eng.ai.data.storage
+package ru.eng.ai.data.storage.room
 
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import ru.eng.ai.data.storage.dao.MessageDao
-import ru.eng.ai.data.storage.dao.TokenDao
-import ru.eng.ai.data.storage.entity.MessageEntity
-import ru.eng.ai.data.storage.entity.TokenEntity
-import ru.eng.ai.data.storage.provider.DatabaseConstructor
+import ru.eng.ai.data.storage.room.dao.MessageDao
+import ru.eng.ai.data.storage.room.dao.TokenDao
+import ru.eng.ai.data.storage.room.entity.MessageEntity
+import ru.eng.ai.data.storage.room.entity.TokenEntity
+import ru.eng.ai.data.storage.room.provider.DatabaseConstructor
 
 @Database(
     entities = [TokenEntity::class, MessageEntity::class],

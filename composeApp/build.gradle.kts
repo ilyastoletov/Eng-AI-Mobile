@@ -67,6 +67,9 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.room.sqliteBundled)
 
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences)
+
             implementation(libs.kotlinx.datetime)
         }
         iosMain.dependencies {

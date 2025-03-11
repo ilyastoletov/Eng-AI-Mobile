@@ -8,8 +8,8 @@ import ru.eng.ai.data.network.KtorClient
 import ru.eng.ai.data.repository.user.dto.AuthTokenResponse
 import ru.eng.ai.data.repository.user.dto.LoginRequest
 import ru.eng.ai.data.repository.user.mapper.toLoginRequest
-import ru.eng.ai.data.storage.dao.TokenDao
-import ru.eng.ai.data.storage.entity.TokenEntity
+import ru.eng.ai.data.storage.room.dao.TokenDao
+import ru.eng.ai.data.storage.room.entity.TokenEntity
 
 interface UserRepository {
     suspend fun registerOrLoginWithDeviceId(deviceId: String): Result<Unit>

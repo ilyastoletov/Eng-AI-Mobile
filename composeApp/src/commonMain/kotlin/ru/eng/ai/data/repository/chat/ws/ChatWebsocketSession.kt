@@ -14,11 +14,17 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import ru.eng.ai.data.network.KtorClient
 import ru.eng.ai.data.network.WebSocketSession
 import ru.eng.ai.data.repository.chat.mapper.getRandomUUIDString
+import ru.eng.ai.data.repository.chat.storage.MessageLimitController
+import ru.eng.ai.exception.EmptyMessageException
+import ru.eng.ai.exception.MessageLimitReachedException
 import ru.eng.ai.model.Message
 import ru.eng.ai.tool.getCurrentTimeAsClock
 import kotlin.coroutines.cancellation.CancellationException
 
-internal class ChatWebsocketSession(private val client: KtorClient) : WebSocketSession<Message> {
+internal class ChatWebsocketSession(
+    private val client: KtorClient,
+    private val limitController: MessageLimitController
+) : WebSocketSession<Message> {
 
     private var innerSession: DefaultClientWebSocketSession? = null
 
@@ -26,8 +32,7 @@ internal class ChatWebsocketSession(private val client: KtorClient) : WebSocketS
         val ws = client.openWebsocketSession(WS_URL)
         innerSession = ws
         emitAll(
-            ws.incoming.receiveAsFlow()
-                .map { it.toMessageResult() }
+            ws.incoming.receiveAsFlow().map(::checkLimitAndMap)
         )
     }.catch { emit(Result.failure(it)) }
 
@@ -38,6 +43,13 @@ internal class ChatWebsocketSession(private val client: KtorClient) : WebSocketS
     override suspend fun close() {
         innerSession?.close()
     }
+
+    private suspend fun checkLimitAndMap(frame: Frame): Result<Message> =
+        if (limitController.isMessageLimitReached()) {
+            Result.failure(MessageLimitReachedException)
+        } else {
+            frame.toMessageResult()
+        }
 
     private fun Frame.toMessageResult(): Result<Message> =
         decodeToStringResult().mapCatching { text ->
@@ -53,11 +65,11 @@ internal class ChatWebsocketSession(private val client: KtorClient) : WebSocketS
         runCatching {
             when (this) {
                 is Frame.Close -> throw CancellationException(this.data.decodeToString())
-                is Frame.Ping -> throw NoData
-                is Frame.Pong -> throw NoData
+                is Frame.Ping -> throw EmptyMessageException
+                is Frame.Pong -> throw EmptyMessageException
                 is Frame.Binary -> this.data.decodeToString()
                 is Frame.Text -> this.readText()
-                else -> throw NoData
+                else -> throw EmptyMessageException
             }
         }
 

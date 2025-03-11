@@ -29,6 +29,7 @@ class ChatViewModel(
     fun dispatch(action: ChatAction) {
         when(action) {
             is ChatAction.RegisterOrLogin -> registerOrLogin()
+            is ChatAction.CheckLimitReached -> checkLimitReached()
             is ChatAction.SelectCharacter -> changeCharacter(action.newCharacter)
             is ChatAction.SendMessage -> sendMessage(action.text)
             is ChatAction.CopyMessageText -> copyMessageText(action.text)
@@ -43,6 +44,13 @@ class ChatViewModel(
         }
     }
 
+    private fun checkLimitReached() = intent {
+        withContext(Dispatchers.IO) {
+            val isReached = chatRepository.isMessageLimitReached()
+            reduce { state.copy(limitReached = isReached) }
+        }
+    }
+
     init {
         loadSavedMessages()
         chatRepository.incomingMessages
@@ -54,6 +62,7 @@ class ChatViewModel(
         messageResult.fold(
             onSuccess = { message ->
                 chatRepository.saveMessage(state.selectedCharacter, message)
+                chatRepository.incrementMessagesCount()
                 appendMessage(message)
             },
             onFailure = { error ->

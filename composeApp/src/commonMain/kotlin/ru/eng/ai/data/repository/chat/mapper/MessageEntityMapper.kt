@@ -1,6 +1,6 @@
 package ru.eng.ai.data.repository.chat.mapper
 
-import ru.eng.ai.data.storage.entity.MessageEntity
+import ru.eng.ai.data.storage.room.entity.MessageEntity
 import ru.eng.ai.model.Message
 import ru.eng.ai.tool.getTomorrowTimestamp
 import kotlin.uuid.ExperimentalUuidApi

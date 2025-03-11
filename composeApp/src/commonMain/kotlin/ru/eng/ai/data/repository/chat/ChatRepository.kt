@@ -6,8 +6,9 @@ import ru.eng.ai.data.network.WebSocketSession
 import ru.eng.ai.data.repository.chat.mapper.getRandomUUIDString
 import ru.eng.ai.data.repository.chat.mapper.toEntity
 import ru.eng.ai.data.repository.chat.mapper.toMessage
-import ru.eng.ai.data.storage.dao.MessageDao
-import ru.eng.ai.data.storage.dao.TokenDao
+import ru.eng.ai.data.repository.chat.storage.MessageLimitController
+import ru.eng.ai.data.storage.room.dao.MessageDao
+import ru.eng.ai.data.storage.room.dao.TokenDao
 import ru.eng.ai.model.Character
 import ru.eng.ai.model.Message
 import ru.eng.ai.tool.getCurrentTimeAsClock
@@ -18,12 +19,15 @@ interface ChatRepository {
     suspend fun sendMessage(character: Character, text: String): Message
     suspend fun saveMessage(character: Character, message: Message)
     suspend fun togglePinOnMessage(messageId: String): Result<Unit>
+    suspend fun isMessageLimitReached(): Boolean
+    suspend fun incrementMessagesCount()
 }
 
 internal class ChatRepositoryImpl(
     private val tokenDao: TokenDao,
     private val messagesDao: MessageDao,
-    private val webSocketSession: WebSocketSession<Message>
+    private val webSocketSession: WebSocketSession<Message>,
+    private val messageLimitController: MessageLimitController
 ) : ChatRepository {
 
     override val incomingMessages: Flow<Result<Message>>
@@ -33,6 +37,7 @@ internal class ChatRepositoryImpl(
         val now = Clock.System.now()
         val expirationTimestamp = messagesDao.getLatestExpirationTime() ?: now.epochSeconds
         return if (now.epochSeconds > expirationTimestamp) {
+            messageLimitController.reset()
             messagesDao.clear()
             emptyList()
         } else {
@@ -44,7 +49,7 @@ internal class ChatRepositoryImpl(
 
     override suspend fun sendMessage(character: Character, text: String): Message {
         val authToken = tokenDao.getToken()?.token.orEmpty()
-        val composedMessage = "$authToken:${character.getInternalName()}:$text"
+        val composedMessage = "$authToken:${character.getInternalName()}:$text:chat"
         val message = buildOwnMessage(text)
         webSocketSession.send(composedMessage)
         saveMessage(character, message)
@@ -58,6 +63,14 @@ internal class ChatRepositoryImpl(
 
     override suspend fun togglePinOnMessage(messageId: String): Result<Unit> {
         return runCatching { messagesDao.togglePinOnMessage(messageId) }
+    }
+
+    override suspend fun isMessageLimitReached(): Boolean {
+        return messageLimitController.isMessageLimitReached()
+    }
+
+    override suspend fun incrementMessagesCount() {
+        messageLimitController.incrementMessagesCount()
     }
 
     private fun Character.getInternalName() =

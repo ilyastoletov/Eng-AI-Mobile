@@ -1,4 +1,4 @@
-package ru.eng.ai.data.storage.entity
+package ru.eng.ai.data.storage.room.entity
 
 import androidx.room.Entity
 import androidx.room.Index

@@ -1,9 +1,9 @@
-package ru.eng.ai.data.storage.dao
+package ru.eng.ai.data.storage.room.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import ru.eng.ai.data.storage.entity.TokenEntity
+import ru.eng.ai.data.storage.room.entity.TokenEntity
 
 @Dao
 interface TokenDao {
