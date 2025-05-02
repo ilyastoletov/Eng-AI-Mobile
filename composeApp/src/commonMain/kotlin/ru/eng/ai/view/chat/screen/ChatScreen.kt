@@ -76,6 +76,7 @@ private fun Screen(
             Column {
                 ChatTopBar(
                     character = state.selectedCharacter,
+                    chatStatus = state.chatStatus,
                     onClickChangeCharacter = { characterChangeBottomSheetExpanded = true },
                 )
                 if (pinnedMessagesBarEnabled) {

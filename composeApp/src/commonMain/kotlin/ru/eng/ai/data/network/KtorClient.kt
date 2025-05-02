@@ -16,12 +16,13 @@ import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import ru.eng.ai.tool.AppSecrets
 
 internal class KtorClient {
 
     private val client = HttpClient {
         defaultRequest {
-            url("http://103.90.75.40:6464/api/")
+            url(AppSecrets.apiUrl)
         }
         expectSuccess = true
 

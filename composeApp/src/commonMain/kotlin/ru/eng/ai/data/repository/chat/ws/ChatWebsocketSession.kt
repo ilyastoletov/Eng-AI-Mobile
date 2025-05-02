@@ -18,6 +18,7 @@ import ru.eng.ai.data.repository.chat.storage.MessageLimitController
 import ru.eng.ai.exception.EmptyMessageException
 import ru.eng.ai.exception.MessageLimitReachedException
 import ru.eng.ai.model.Message
+import ru.eng.ai.tool.AppSecrets
 import ru.eng.ai.tool.getCurrentTimeAsClock
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -74,7 +75,7 @@ internal class ChatWebsocketSession(
         }
 
     companion object {
-        private const val WS_URL = "ws://103.90.75.40:6464/api/ws/chat"
+        private val WS_URL = AppSecrets.chatWebsocketsUrl
     }
 
 }

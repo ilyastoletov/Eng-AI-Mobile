@@ -26,12 +26,14 @@ import engai.composeapp.generated.resources.ic_info
 import org.jetbrains.compose.resources.painterResource
 import ru.eng.ai.model.Character
 import ru.eng.ai.view.chat.screen.bottomsheet.CharacterInfoBottomSheet
+import ru.eng.ai.view.chat.viewmodel.enumeration.ChatStatus
 import ru.eng.ai.view.shared.Avatar
 import ru.eng.ai.view.theme.EngTheme
 
 @Composable
 fun ChatTopBar(
     character: Character,
+    chatStatus: ChatStatus,
     onClickChangeCharacter: () -> Unit,
 ) {
     var characterInfoBottomSheetVisible by remember { mutableStateOf(false) }
@@ -78,11 +80,17 @@ fun ChatTopBar(
                 Spacer(
                     modifier = Modifier.height(4.dp)
                 )
-                Text(
-                    text = character.shortDescription,
-                    style = EngTheme.typography.semiBold12,
-                    color = EngTheme.colors.dimTertiary
-                )
+                if (chatStatus == ChatStatus.NONE) {
+                    Text(
+                        text = character.shortDescription,
+                        style = EngTheme.typography.semiBold12,
+                        color = EngTheme.colors.dimTertiary
+                    )
+                } else {
+                    ChatStatusIndicator(
+                        currentStatus = chatStatus
+                    )
+                }
             }
         }
 

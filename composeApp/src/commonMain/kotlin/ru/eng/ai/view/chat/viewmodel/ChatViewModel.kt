@@ -18,6 +18,7 @@ import ru.eng.ai.model.Character
 import ru.eng.ai.model.Message
 import ru.eng.ai.tool.copyText
 import ru.eng.ai.tool.getDeviceIdentifier
+import ru.eng.ai.view.chat.viewmodel.enumeration.ChatStatus
 
 class ChatViewModel(
     private val userRepository: UserRepository,
@@ -64,10 +65,12 @@ class ChatViewModel(
                 chatRepository.saveMessage(state.selectedCharacter, message)
                 chatRepository.incrementMessagesCount()
                 appendMessage(message)
+                reduce { state.copy(chatStatus = ChatStatus.NONE) }
             },
             onFailure = { error ->
                 val message = "Ошибка соединения с сервером: ${error.message}"
                 postSideEffect(ChatEffect.ShowSnackbar(message))
+                reduce { state.copy(chatStatus = ChatStatus.ERROR) }
             }
         )
     }
@@ -90,6 +93,7 @@ class ChatViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val sentMessage = chatRepository.sendMessage(state.selectedCharacter, text)
             appendMessage(sentMessage)
+            reduce { state.copy(chatStatus = ChatStatus.WRITING) }
         }
     }
 
@@ -103,7 +107,8 @@ class ChatViewModel(
                 state.copy(
                     selectedCharacter = newCharacter,
                     messages = savedMessages,
-                    fastReplyOptions = fastReplies
+                    fastReplyOptions = fastReplies,
+                    chatStatus = ChatStatus.NONE
                 )
             }
         }
@@ -149,6 +154,4 @@ class ChatViewModel(
         mutableMessages.set(itemIndex, updatedMessage)
         return mutableMessages
     }
-
-
 }
