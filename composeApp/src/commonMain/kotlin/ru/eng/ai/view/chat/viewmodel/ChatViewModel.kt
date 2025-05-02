@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -14,11 +15,15 @@ import org.orbitmvi.orbit.container
 import org.orbitmvi.orbit.syntax.Syntax
 import ru.eng.ai.data.repository.chat.ChatRepository
 import ru.eng.ai.data.repository.user.UserRepository
+import ru.eng.ai.exception.ChatClosedException
+import ru.eng.ai.exception.MessageLimitReachedException
 import ru.eng.ai.model.Character
 import ru.eng.ai.model.Message
 import ru.eng.ai.tool.copyText
 import ru.eng.ai.tool.getDeviceIdentifier
 import ru.eng.ai.view.chat.viewmodel.enumeration.ChatStatus
+
+private const val SESSION_RESTART_TIMEOUT = 5000L
 
 class ChatViewModel(
     private val userRepository: UserRepository,
@@ -54,6 +59,10 @@ class ChatViewModel(
 
     init {
         loadSavedMessages()
+        collectIncomingMessages()
+    }
+
+    private fun collectIncomingMessages() {
         chatRepository.incomingMessages
             .onEach { handleIncomingMessage(it) }
             .launchIn(viewModelScope)
@@ -67,11 +76,7 @@ class ChatViewModel(
                 appendMessage(message)
                 reduce { state.copy(chatStatus = ChatStatus.NONE) }
             },
-            onFailure = { error ->
-                val message = "Ошибка соединения с сервером: ${error.message}"
-                postSideEffect(ChatEffect.ShowSnackbar(message))
-                reduce { state.copy(chatStatus = ChatStatus.ERROR) }
-            }
+            onFailure = { handleChatError(it) }
         )
     }
 
@@ -143,6 +148,36 @@ class ChatViewModel(
                 messages = mutableMessages,
                 fastReplyOptions = emptyList()
             )
+        }
+    }
+
+    private suspend fun Syntax<ChatState, ChatEffect>.handleChatError(error: Throwable) {
+        val message: String
+        when(error) {
+            is ChatClosedException -> {
+                message = "Потеряно соединение с сервером.\nПовторное подключение..."
+                waitAndRestartSession()
+                reduce { state.copy(chatStatus = ChatStatus.RECONNECT) }
+            }
+            is MessageLimitReachedException -> {
+                message = "Превышен лимит отправки сообщений.\nВозвращайтесь через 24 часа"
+            }
+            else -> {
+                message = "Ошибка соединения с сервером: ${error.message}"
+                reduce { state.copy(chatStatus = ChatStatus.ERROR) }
+            }
+        }
+        postSideEffect(ChatEffect.ShowSnackbar(message))
+    }
+
+    private fun waitAndRestartSession() {
+        viewModelScope.launch {
+            delay(SESSION_RESTART_TIMEOUT)
+            collectIncomingMessages()
+        }.invokeOnCompletion {
+            intent {
+                reduce { state.copy(chatStatus = ChatStatus.NONE) }
+            }
         }
     }
 

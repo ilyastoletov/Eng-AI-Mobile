@@ -33,6 +33,13 @@ fun ChatStatusIndicator(currentStatus: ChatStatus) {
                 color = EngTheme.colors.onBackground
             )
         }
+        ChatStatus.RECONNECT -> {
+            Text(
+                text = "Подключение...",
+                style = EngTheme.typography.bold14,
+                color = EngTheme.colors.dimSecondary
+            )
+        }
     }
 }
 

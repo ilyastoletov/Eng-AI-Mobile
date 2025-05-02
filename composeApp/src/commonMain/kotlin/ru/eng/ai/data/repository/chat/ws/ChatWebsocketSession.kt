@@ -15,6 +15,7 @@ import ru.eng.ai.data.network.KtorClient
 import ru.eng.ai.data.network.WebSocketSession
 import ru.eng.ai.data.repository.chat.mapper.getRandomUUIDString
 import ru.eng.ai.data.repository.chat.storage.MessageLimitController
+import ru.eng.ai.exception.ChatClosedException
 import ru.eng.ai.exception.EmptyMessageException
 import ru.eng.ai.exception.MessageLimitReachedException
 import ru.eng.ai.model.Message
@@ -35,7 +36,12 @@ internal class ChatWebsocketSession(
         emitAll(
             ws.incoming.receiveAsFlow().map(::checkLimitAndMap)
         )
-    }.catch { emit(Result.failure(it)) }
+        if (ws.closeReason.await() != null) {
+            emit(Result.failure(ChatClosedException))
+        }
+    }.catch {
+        emit(Result.failure(ChatClosedException))
+    }
 
     override suspend fun send(content: String) {
         innerSession?.send(content)
