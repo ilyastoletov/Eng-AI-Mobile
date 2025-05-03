@@ -13,5 +13,6 @@ data class ChatState(
 ) {
     companion object {
         val defaultFastReplies = listOf("Hello!", "What about can I talk with you today?")
+        val activeDialogFastReplies = listOf("Grammar Check", "Spelling Check")
     }
 }

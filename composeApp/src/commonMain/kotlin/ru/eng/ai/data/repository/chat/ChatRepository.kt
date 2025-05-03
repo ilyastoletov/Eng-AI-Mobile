@@ -49,7 +49,8 @@ internal class ChatRepositoryImpl(
 
     override suspend fun sendMessage(character: Character, text: String): Message {
         val authToken = tokenDao.getToken()?.token.orEmpty()
-        val composedMessage = "$authToken:${character.getInternalName()}:$text:chat"
+        val chatType = getChatType(messageText = text)
+        val composedMessage = "$authToken:${character.getInternalName()}:$text:$chatType"
         val message = buildOwnMessage(text)
         webSocketSession.send(composedMessage)
         saveMessage(character, message)
@@ -90,4 +91,9 @@ internal class ChatRepositoryImpl(
         )
     }
 
+    private fun getChatType(messageText: String): String = when(messageText) {
+        "Grammar Check" -> "grammar"
+        "Spelling Check" -> "spelling"
+        else -> "chat"
+    }
 }

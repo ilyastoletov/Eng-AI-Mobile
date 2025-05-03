@@ -199,10 +199,6 @@ private fun ToggleFastReplyButton(
                 color = EngTheme.colors.primary,
                 shape = CircleShape
             )
-//            .padding(
-//                vertical = 14.dp,
-//                horizontal = 10.dp
-//            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,

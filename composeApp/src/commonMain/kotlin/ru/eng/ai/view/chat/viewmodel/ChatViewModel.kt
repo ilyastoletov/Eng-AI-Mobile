@@ -87,7 +87,7 @@ class ChatViewModel(
                 reduce {
                     state.copy(
                         messages = messages,
-                        fastReplyOptions = emptyList()
+                        fastReplyOptions = ChatState.activeDialogFastReplies
                     )
                 }
             }
@@ -105,8 +105,11 @@ class ChatViewModel(
     private fun changeCharacter(newCharacter: Character) = intent {
         viewModelScope.launch(Dispatchers.IO) {
             val savedMessages = chatRepository.getSavedMessages(newCharacter)
-            val fastReplies =
-                if (savedMessages.isEmpty()) ChatState.defaultFastReplies else emptyList()
+            val fastReplies = if (savedMessages.isEmpty()) {
+                ChatState.defaultFastReplies
+            } else {
+                ChatState.activeDialogFastReplies
+            }
 
             reduce {
                 state.copy(
@@ -146,7 +149,7 @@ class ChatViewModel(
             mutableMessages.add(message)
             state.copy(
                 messages = mutableMessages,
-                fastReplyOptions = emptyList()
+                fastReplyOptions = ChatState.activeDialogFastReplies
             )
         }
     }
