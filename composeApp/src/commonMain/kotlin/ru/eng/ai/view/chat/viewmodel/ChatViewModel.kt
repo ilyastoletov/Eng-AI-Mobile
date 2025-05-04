@@ -2,6 +2,8 @@ package ru.eng.ai.view.chat.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import engai.composeapp.generated.resources.Res
+import engai.composeapp.generated.resources.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
@@ -9,6 +11,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.StringResource
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -137,7 +140,7 @@ class ChatViewModel(
 
     private fun copyMessageText(text: String) = intent {
         copyText(text)
-        postSideEffect(ChatEffect.ShowSnackbar("Текст сообщения скопирован"))
+        postSideEffect(ChatEffect.ShowSnackbar(Res.string.copy_success_message))
     }
 
     private fun toggleMessagePin(messageId: String) = intent {
@@ -150,7 +153,9 @@ class ChatViewModel(
                     }
                 },
                 onFailure = { error ->
-                    postSideEffect(ChatEffect.ShowSnackbar("Ошибка закрепления: ${error.message}"))
+                    postSideEffect(
+                        ChatEffect.ShowSnackbar(Res.string.message_pin_error, error.message.orEmpty())
+                    )
                 }
             )
         }
@@ -168,19 +173,24 @@ class ChatViewModel(
     }
 
     private suspend fun Syntax<ChatState, ChatEffect>.handleChatError(error: Throwable) {
-        val message: String
+        val message: StringResource
         when(error) {
             is ChatClosedException -> {
-                message = "Потеряно соединение с сервером.\nПовторное подключение..."
+                message = Res.string.error_connection_lost
                 waitAndRestartSession()
                 reduce { state.copy(chatStatus = ChatStatus.RECONNECT) }
             }
             is MessageLimitReachedException -> {
-                message = "Превышен лимит отправки сообщений.\nВозвращайтесь через 24 часа"
+                message = Res.string.error_limit_exceeded
             }
             else -> {
-                message = "Ошибка соединения с сервером: ${error.message}"
                 reduce { state.copy(chatStatus = ChatStatus.ERROR) }
+                postSideEffect(
+                    ChatEffect.ShowSnackbar(
+                        Res.string.error_server_connection, error.message.orEmpty()
+                    )
+                )
+                return
             }
         }
         postSideEffect(ChatEffect.ShowSnackbar(message))

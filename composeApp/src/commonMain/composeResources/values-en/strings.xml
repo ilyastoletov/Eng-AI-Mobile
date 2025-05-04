@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- User Interface -->
+    <string name="status_error">Error</string>
+    <string name="status_connecting">Connecting...</string>
+    <string name="status_writing">Typing...</string>
+    <string name="limit_reached_notice">You have exceeded message limit for today</string>
+    <string name="menu_copy">Copy</string>
+    <string name="menu_pin">Pin</string>
+    <string name="menu_unpin">Unpin</string>
+    <string name="enter_message">Enter message...</string>
+    <string name="pinned_messages">Pinned messages</string>
+    <string name="copy_success_message">Message text copied</string>
+    <string name="message_pin_error">Error while trying to pin message: %s</string>
+    <string name="error_connection_lost">Server connection lost.\nTrying to connect again...</string>
+    <string name="error_limit_exceeded">Message limit exceeded for today.\nPlease come back tomorrow</string>
+    <string name="error_server_connection">Server connection error: %s</string>
+
+    <!-- Characters -->
+    <string name="traveler_name">Gregory</string>
+    <string name="traveler_short_description">Traveler</string>
+    <string name="traveler_description">Curious and active traveler. He has traveled to many countries and will gladly tell you about the culture and language of each country.</string>
+    <string name="professor_name">Brenda</string>
+    <string name="professor_short_description">English Teacher</string>
+    <string name="professor_description">Brenda Davies is Professor of Linguistics at the University of Oxford. As an English language specialist, she will help you practice both vocabulary and grammar.</string>
+    <string name="native_speaker_name">Tayler</string>
+    <string name="native_speaker_short_description">Native Speaker</string>
+    <string name="native_speaker_description">Friendly Californian, likes to socialize with foreigners. He can talk to you about your favorite hobbies and about life in general.</string>
+
+</resources>

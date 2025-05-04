@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.model.Character
 import ru.eng.ai.view.shared.Avatar
 import ru.eng.ai.view.theme.EngTheme
@@ -45,8 +46,8 @@ fun SelectCharacterBottomSheet(
         characters.fastForEach { character ->
             SelectCharacterItem(
                 avatarResource = character.avatarResource,
-                name = character.name,
-                shortDescription = character.shortDescription,
+                name = stringResource(character.nameResource),
+                shortDescription = stringResource(character.shortDescriptionResource),
                 isSelected = selected == character,
                 onClick = {
                     onSelect(character)

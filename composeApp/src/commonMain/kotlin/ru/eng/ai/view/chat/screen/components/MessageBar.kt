@@ -34,9 +34,11 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import engai.composeapp.generated.resources.Res
+import engai.composeapp.generated.resources.enter_message
 import engai.composeapp.generated.resources.ic_chevron_left
 import engai.composeapp.generated.resources.ic_send
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.tool.keyboardAsState
 import ru.eng.ai.view.theme.EngTheme
 
@@ -163,7 +165,7 @@ private fun MessageTextField(
             ) {
                 if (text.isEmpty()) {
                     Text(
-                        text = "Сообщение...",
+                        text = stringResource(Res.string.enter_message),
                         style = EngTheme.typography.medium14,
                         color = EngTheme.colors.dimTertiary
                     )

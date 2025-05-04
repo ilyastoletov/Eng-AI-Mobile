@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- User Interface -->
+    <string name="status_error">Ошибка</string>
+    <string name="status_connecting">Подключение...</string>
+    <string name="status_writing">Печатает...</string>
+    <string name="limit_reached_notice">Вы превысили лимит общения на сегодня</string>
+    <string name="menu_copy">Копировать</string>
+    <string name="menu_pin">Закрепить</string>
+    <string name="menu_unpin">Открепить</string>
+    <string name="enter_message">Сообщение...</string>
+    <string name="pinned_messages">Закреплённые сообщения</string>
+    <string name="copy_success_message">Текст сообщения скопирован</string>
+    <string name="message_pin_error">Ошибка закрепления: %s</string>
+    <string name="error_connection_lost">Потеряно соединение с сервером.\nПовторное подключение...</string>
+    <string name="error_limit_exceeded">Превышен лимит отправки сообщений.\nВозвращайтесь через 24 часа</string>
+    <string name="error_server_connection">Ошибка соединения с сервером: %s</string>
+
+    <!-- Characters -->
+    <string name="traveler_name">Грегори</string>
+    <string name="traveler_short_description">Путешественник</string>
+    <string name="traveler_description">Любознательный и активный путешественник. Побывал во многих странах и с удовольствием расскажет о культуре и особенности языка каждой из стран.</string>
+    <string name="professor_name">Бренда</string>
+    <string name="professor_short_description">Учитель Английского</string>
+    <string name="professor_description">Бренда Дейвис профессор лингвистики в университете Оксфорда. Специалист по английскому языку, она поможет вам практиковать и лексику, и грамматику.</string>
+    <string name="native_speaker_name">Тайлер</string>
+    <string name="native_speaker_short_description">Носитель языка</string>
+    <string name="native_speaker_description">Дружелюбный житель Калифорнии, любит общатся с иностранцами. Может поговорить с вами на тему любимых увлечений, да и в целом о жизни.</string>
+
+</resources>

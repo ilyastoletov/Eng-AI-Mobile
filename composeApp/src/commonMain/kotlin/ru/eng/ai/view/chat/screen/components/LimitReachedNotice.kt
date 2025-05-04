@@ -10,6 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import engai.composeapp.generated.resources.Res
+import engai.composeapp.generated.resources.limit_reached_notice
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.view.theme.EngTheme
 
 @Composable
@@ -25,7 +28,7 @@ fun LimitReachedNotice() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Вы превысили лимит общения на сегодня",
+            text = stringResource(Res.string.limit_reached_notice),
             style = EngTheme.typography.medium14,
             color = EngTheme.colors.dimSecondary,
             textAlign = TextAlign.Center,

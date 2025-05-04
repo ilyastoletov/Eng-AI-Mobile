@@ -24,6 +24,7 @@ import engai.composeapp.generated.resources.Res
 import engai.composeapp.generated.resources.ic_arrow_down
 import engai.composeapp.generated.resources.ic_info
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.model.Character
 import ru.eng.ai.view.chat.screen.bottomsheet.CharacterInfoBottomSheet
 import ru.eng.ai.view.chat.viewmodel.enumeration.ChatStatus
@@ -73,7 +74,7 @@ fun ChatTopBar(
             )
             Column {
                 Text(
-                    text = character.name,
+                    text = stringResource(character.nameResource),
                     style = EngTheme.typography.bold20,
                     color = EngTheme.colors.dimSecondary
                 )
@@ -82,7 +83,7 @@ fun ChatTopBar(
                 )
                 if (chatStatus == ChatStatus.NONE) {
                     Text(
-                        text = character.shortDescription,
+                        text = stringResource(character.shortDescriptionResource),
                         style = EngTheme.typography.semiBold12,
                         color = EngTheme.colors.dimTertiary
                     )
@@ -109,9 +110,9 @@ fun ChatTopBar(
     if (characterInfoBottomSheetVisible) {
         CharacterInfoBottomSheet(
             avatarResource = character.avatarResource,
-            description = character.description,
-            name = character.name,
-            shortDescription = character.shortDescription,
+            description = stringResource(character.descriptionResource),
+            name = stringResource(character.nameResource),
+            shortDescription = stringResource(character.shortDescriptionResource),
             onDismiss = { characterInfoBottomSheetVisible = false }
         )
     }

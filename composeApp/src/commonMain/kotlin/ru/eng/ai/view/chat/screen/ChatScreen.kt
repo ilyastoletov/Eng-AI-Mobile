@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.getString
 import ru.eng.ai.model.Message
 import ru.eng.ai.view.chat.screen.components.ChatTopBar
 import ru.eng.ai.view.chat.screen.components.MessageBar
@@ -120,7 +121,9 @@ private fun Screen(
     LaunchedEffect(sideEffect) {
         when(sideEffect) {
             is ChatEffect.ShowSnackbar -> {
-                snackbarHostState.showSnackbar(message = sideEffect.message)
+                snackbarHostState.showSnackbar(
+                    message = getString(sideEffect.messageResource, sideEffect.formatArg)
+                )
             }
             is ChatEffect.NoEffect -> {}
         }

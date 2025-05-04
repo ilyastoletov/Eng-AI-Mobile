@@ -22,7 +22,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import engai.composeapp.generated.resources.Res
 import engai.composeapp.generated.resources.ic_pin
+import engai.composeapp.generated.resources.pinned_messages
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.model.Message
 import ru.eng.ai.view.chat.screen.bottomsheet.PinnedMessagesBottomSheet
 import ru.eng.ai.view.theme.EngTheme
@@ -62,7 +64,7 @@ fun PinnedMessagesBar(
             modifier = Modifier.width(13.dp)
         )
         Text(
-            text = "Закреплённые сообщения",
+            text = stringResource(Res.string.pinned_messages),
             style = EngTheme.typography.semiBold16,
             color = EngTheme.colors.dimSecondary
         )

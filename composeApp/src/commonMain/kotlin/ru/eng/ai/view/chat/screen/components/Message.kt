@@ -33,8 +33,12 @@ import engai.composeapp.generated.resources.Res
 import engai.composeapp.generated.resources.ic_copy
 import engai.composeapp.generated.resources.ic_pin
 import engai.composeapp.generated.resources.ic_pin_filled
+import engai.composeapp.generated.resources.menu_copy
+import engai.composeapp.generated.resources.menu_pin
+import engai.composeapp.generated.resources.menu_unpin
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.view.theme.EngTheme
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -127,12 +131,14 @@ private fun MessageOptionsMenu(
         onDismissRequest = onDismiss
     ) {
         MessageOption(
-            text = "Копировать",
+            text = stringResource(Res.string.menu_copy),
             iconRes = Res.drawable.ic_copy,
             onClick = { onClickCopy(); onDismiss() }
         )
         MessageOption(
-            text = if (isPinned) "Открепить" else "Закрепить",
+            text = stringResource(
+                resource = if (isPinned) Res.string.menu_unpin else Res.string.menu_pin
+            ),
             iconRes = Res.drawable.ic_pin,
             onClick = { onClickPin(); onDismiss() }
         )
