@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import engai.composeapp.generated.resources.Res
 import engai.composeapp.generated.resources.ic_chevron_left
 import engai.composeapp.generated.resources.ic_send
 import org.jetbrains.compose.resources.painterResource
+import ru.eng.ai.tool.keyboardAsState
 import ru.eng.ai.view.theme.EngTheme
 
 @Composable
@@ -44,7 +46,14 @@ fun MessageBar(
     var messageText by remember { mutableStateOf("") }
 
     val fastReplyOptionsEnabled = remember(fastReplyOptions) { fastReplyOptions.isNotEmpty() }
-    var replyOptionsVisible by remember { mutableStateOf(true) }
+    var isReplyOptionsVisible by remember { mutableStateOf(true) }
+
+    val isKeyboardVisible by keyboardAsState()
+    LaunchedEffect(isKeyboardVisible) {
+        if (isKeyboardVisible && isReplyOptionsVisible) {
+            isReplyOptionsVisible = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -61,8 +70,8 @@ fun MessageBar(
             text = messageText,
             onChangeText = { messageText = it },
             enableFastReplyButton = fastReplyOptionsEnabled,
-            fastReplyOpen = replyOptionsVisible,
-            onToggleFastReply = { replyOptionsVisible = !replyOptionsVisible },
+            fastReplyOpen = isReplyOptionsVisible,
+            onToggleFastReply = { isReplyOptionsVisible = !isReplyOptionsVisible },
             onClickSend = {
                 if (messageText.isNotEmpty()) {
                     onSendMessage(messageText)
@@ -70,7 +79,7 @@ fun MessageBar(
                 }
             }
         )
-        if (fastReplyOptionsEnabled && replyOptionsVisible) {
+        if (fastReplyOptionsEnabled && isReplyOptionsVisible) {
             Spacer(
                 modifier = Modifier.height(28.dp)
             )
@@ -82,7 +91,10 @@ fun MessageBar(
                     FastReplyButton(
                         modifier = Modifier.fillMaxWidth(),
                         replyText = text,
-                        onClick = { onSendMessage(text) }
+                        onClick = {
+                            onSendMessage(text)
+                            isReplyOptionsVisible = false
+                        }
                     )
                 }
             }
