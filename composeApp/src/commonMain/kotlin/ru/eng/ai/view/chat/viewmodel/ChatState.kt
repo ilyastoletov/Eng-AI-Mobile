@@ -8,8 +8,9 @@ data class ChatState(
     val selectedCharacter: Character = Character.Traveler,
     val messages: List<Message> = emptyList(),
     val fastReplyOptions: List<String> = defaultFastReplies,
-    val limitReached: Boolean = false,
     val chatStatus: ChatStatus = ChatStatus.NONE,
+    val isLimitReached: Boolean = false,
+    val isSendingAllowed: Boolean = true,
 ) {
     companion object {
         val defaultFastReplies = listOf("Hello!", "What about can I talk with you today?")

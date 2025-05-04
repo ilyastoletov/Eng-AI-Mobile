@@ -53,19 +53,32 @@ class ChatViewModel(
     private fun checkLimitReached() = intent {
         withContext(Dispatchers.IO) {
             val isReached = chatRepository.isMessageLimitReached()
-            reduce { state.copy(limitReached = isReached) }
+            reduce { state.copy(isLimitReached = isReached) }
         }
     }
 
     init {
         loadSavedMessages()
         collectIncomingMessages()
+        watchIsSendingAllowed()
     }
 
     private fun collectIncomingMessages() {
         chatRepository.incomingMessages
             .onEach { handleIncomingMessage(it) }
             .launchIn(viewModelScope)
+    }
+
+    private fun watchIsSendingAllowed() {
+        viewModelScope.launch {
+            container.stateFlow.collect { state ->
+                val chatStatus = state.chatStatus
+                val isSendingEnabled = chatStatus == ChatStatus.NONE
+                intent {
+                    reduce { state.copy(isSendingAllowed = isSendingEnabled) }
+                }
+            }
+        }
     }
 
     private fun handleIncomingMessage(messageResult: Result<Message>) = intent {

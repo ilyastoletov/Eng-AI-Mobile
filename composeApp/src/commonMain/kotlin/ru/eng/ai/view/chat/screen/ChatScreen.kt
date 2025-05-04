@@ -87,9 +87,10 @@ private fun Screen(
             }
         },
         bottomBar = {
-            if (!state.limitReached) {
+            if (!state.isLimitReached) {
                 MessageBar(
                     fastReplyOptions = state.fastReplyOptions,
+                    isSendingAllowed = state.isSendingAllowed,
                     onSendMessage = { onIntent.invoke(ChatAction.SendMessage(it)) },
                 )
             } else {

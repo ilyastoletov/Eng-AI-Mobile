@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -41,6 +43,7 @@ import ru.eng.ai.view.theme.EngTheme
 @Composable
 fun MessageBar(
     fastReplyOptions: List<String>,
+    isSendingAllowed: Boolean,
     onSendMessage: (String) -> Unit,
 ) {
     var messageText by remember { mutableStateOf("") }
@@ -70,7 +73,8 @@ fun MessageBar(
             text = messageText,
             onChangeText = { messageText = it },
             enableFastReplyButton = fastReplyOptionsEnabled,
-            fastReplyOpen = isReplyOptionsVisible,
+            isFastReplyOpen = isReplyOptionsVisible,
+            isSendingAllowed = isSendingAllowed,
             onToggleFastReply = { isReplyOptionsVisible = !isReplyOptionsVisible },
             onClickSend = {
                 if (messageText.isNotEmpty()) {
@@ -108,7 +112,8 @@ private fun MessageTextField(
     modifier: Modifier = Modifier,
     text: String,
     enableFastReplyButton: Boolean,
-    fastReplyOpen: Boolean,
+    isFastReplyOpen: Boolean,
+    isSendingAllowed: Boolean,
     onToggleFastReply: () -> Unit,
     onChangeText: (String) -> Unit,
     onClickSend: () -> Unit
@@ -142,7 +147,7 @@ private fun MessageTextField(
                             bottom = 6.dp,
                             top = 6.dp
                         ),
-                    open = fastReplyOpen,
+                    open = isFastReplyOpen,
                     onClick = onToggleFastReply
                 )
             }
@@ -165,35 +170,10 @@ private fun MessageTextField(
                 }
                 innerTextField.invoke()
             }
-            Box(
-                modifier = Modifier
-                    .weight(0.15f)
-                    .padding(6.dp)
-                    .size(36.dp)
-                    .background(
-                        color = EngTheme.colors.primary,
-                        shape = CircleShape
-                    )
-                    .padding(
-                        start = 10.dp,
-                        end = 6.dp,
-                        top = 6.dp,
-                        bottom = 6.dp
-                    )
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onClickSend
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_send),
-                    tint = EngTheme.colors.dimSecondary,
-                    contentDescription = null,
-                    modifier = Modifier
-                )
-            }
+            SendMessageButton(
+                isEnabled = isSendingAllowed,
+                onClick = onClickSend
+            )
         }
     }
 }
@@ -253,6 +233,45 @@ private fun FastReplyButton(
             textAlign = TextAlign.Center,
             style = EngTheme.typography.semiBold16,
             color = EngTheme.colors.dimSecondary
+        )
+    }
+}
+
+@Composable
+private fun RowScope.SendMessageButton(
+    isEnabled: Boolean,
+    onClick: () -> Unit
+) {
+    val alpha = remember(isEnabled) { if (isEnabled) 1.0F else 0.6F }
+
+    Box(
+        modifier = Modifier
+            .alpha(alpha)
+            .weight(0.15f)
+            .padding(6.dp)
+            .size(36.dp)
+            .background(
+                color = EngTheme.colors.primary,
+                shape = CircleShape
+            )
+            .padding(
+                start = 10.dp,
+                end = 6.dp,
+                top = 6.dp,
+                bottom = 6.dp
+            )
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { if (isEnabled) onClick() }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.ic_send),
+            tint = EngTheme.colors.dimSecondary,
+            contentDescription = null,
+            modifier = Modifier
         )
     }
 }
