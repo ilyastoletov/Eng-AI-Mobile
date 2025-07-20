@@ -22,15 +22,25 @@ import engai.composeapp.generated.resources.Res
 import engai.composeapp.generated.resources.status_connecting
 import engai.composeapp.generated.resources.status_error
 import engai.composeapp.generated.resources.status_writing
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.view.chat.viewmodel.enumeration.ChatStatus
 import ru.eng.ai.view.theme.EngTheme
 
 @Composable
-fun ChatStatusIndicator(currentStatus: ChatStatus) {
+fun ChatStatusIndicator(
+    currentStatus: ChatStatus,
+    characterName: StringResource
+) {
     when(currentStatus) {
-        ChatStatus.NONE -> {}
         ChatStatus.WRITING -> StatusWriting()
+        ChatStatus.NONE -> {
+            Text(
+                text = stringResource(characterName),
+                style = EngTheme.typography.semiBold12,
+                color = EngTheme.colors.dimTertiary
+            )
+        }
         ChatStatus.ERROR -> {
             Text(
                 text = stringResource(Res.string.status_error),

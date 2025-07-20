@@ -89,8 +89,7 @@ class ChatViewModel(
             onSuccess = { message ->
                 chatRepository.saveMessage(state.selectedCharacter, message)
                 chatRepository.incrementMessagesCount()
-                appendMessage(message)
-                reduce { state.copy(chatStatus = ChatStatus.NONE) }
+                appendMessage(message, status = ChatStatus.NONE)
             },
             onFailure = { handleChatError(it) }
         )
@@ -98,12 +97,17 @@ class ChatViewModel(
 
     private fun loadSavedMessages() = intent {
         viewModelScope.launch(Dispatchers.IO) {
-            val messages = chatRepository.getSavedMessages(state.selectedCharacter)
-            if (messages.isNotEmpty()) {
-                reduce {
+            val character = state.selectedCharacter
+            val messages = chatRepository.getSavedMessages(character)
+            reduce {
+                if (messages.isNotEmpty()) {
                     state.copy(
                         messages = messages,
-                        fastReplyOptions = ChatState.activeDialogFastReplies
+                        fastReplyOptions = Character.languageCheckFastReplies
+                    )
+                } else {
+                    state.copy(
+                        fastReplyOptions = character.fastReplies
                     )
                 }
             }
@@ -113,8 +117,7 @@ class ChatViewModel(
     private fun sendMessage(text: String) = intent {
         viewModelScope.launch(Dispatchers.IO) {
             val sentMessage = chatRepository.sendMessage(state.selectedCharacter, text)
-            appendMessage(sentMessage)
-            reduce { state.copy(chatStatus = ChatStatus.WRITING) }
+            appendMessage(sentMessage, status = ChatStatus.WRITING)
         }
     }
 
@@ -122,9 +125,9 @@ class ChatViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val savedMessages = chatRepository.getSavedMessages(newCharacter)
             val fastReplies = if (savedMessages.isEmpty()) {
-                ChatState.defaultFastReplies
+                newCharacter.fastReplies
             } else {
-                ChatState.activeDialogFastReplies
+                Character.languageCheckFastReplies
             }
 
             reduce {
@@ -161,13 +164,14 @@ class ChatViewModel(
         }
     }
 
-    private suspend fun Syntax<ChatState, ChatEffect>.appendMessage(message: Message) {
+    private suspend fun Syntax<ChatState, ChatEffect>.appendMessage(message: Message, status: ChatStatus) {
         reduce {
             val mutableMessages = state.messages.toMutableList()
             mutableMessages.add(message)
             state.copy(
                 messages = mutableMessages,
-                fastReplyOptions = ChatState.activeDialogFastReplies
+                fastReplyOptions = Character.languageCheckFastReplies,
+                chatStatus = status
             )
         }
     }
@@ -187,7 +191,8 @@ class ChatViewModel(
                 reduce { state.copy(chatStatus = ChatStatus.ERROR) }
                 postSideEffect(
                     ChatEffect.ShowSnackbar(
-                        Res.string.error_server_connection, error.message.orEmpty()
+                        messageResource = Res.string.error_server_connection,
+                        formatArg = error.message.orEmpty()
                     )
                 )
                 return

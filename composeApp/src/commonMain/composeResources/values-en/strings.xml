@@ -16,6 +16,11 @@
     <string name="error_connection_lost">Server connection lost.\nTrying to connect again...</string>
     <string name="error_limit_exceeded">Message limit exceeded for today.\nPlease come back tomorrow</string>
     <string name="error_server_connection">Server connection error: %s</string>
+    <string name="you">You</string>
+    <string name="character">Character</string>
+    <string name="feedback_title">Experiencing any issues with application?\n</string>
+    <string name="feedback_subtitle">Contact developer</string>
+    <string name="feedback_text">eng.ai developer contacts:\n\nIlya Stoletov\nTelegram: @risely\nE-mail: ilastoletov7@gmail.com</string>
 
     <!-- Characters -->
     <string name="traveler_name">Gregory</string>

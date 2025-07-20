@@ -18,8 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
+import engai.composeapp.generated.resources.Res
+import engai.composeapp.generated.resources.feedback_subtitle
+import engai.composeapp.generated.resources.feedback_title
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -32,7 +40,8 @@ import ru.eng.ai.view.theme.EngTheme
 fun SelectCharacterBottomSheet(
     selected: Character,
     onDismiss: () -> Unit,
-    onSelect: (Character) -> Unit
+    onSelect: (Character) -> Unit,
+    onClickFeedback: () -> Unit
 ) {
     val characters = remember {
         listOf(Character.Traveler, Character.Scientist, Character.NativeSpeaker)
@@ -55,6 +64,12 @@ fun SelectCharacterBottomSheet(
                 }
             )
         }
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
+        ApplicationFeedback(
+            onClick = onClickFeedback
+        )
         Spacer(
             modifier = Modifier.height(60.dp)
         )
@@ -114,4 +129,33 @@ private fun SelectCharacterItem(
             )
         }
     }
+}
+
+@Composable
+private fun ApplicationFeedback(onClick: () -> Unit) {
+    val feedbackText = buildAnnotatedString {
+        append(stringResource(Res.string.feedback_title))
+        withStyle(
+            style = SpanStyle(
+                color = EngTheme.colors.background,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            append(stringResource(Res.string.feedback_subtitle))
+        }
+    }
+
+    Text(
+        text = feedbackText,
+        style = EngTheme.typography.medium12,
+        color = EngTheme.colors.dimSecondary,
+        modifier = Modifier
+            .alpha(0.5F)
+            .padding(horizontal = 30.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
+    )
 }

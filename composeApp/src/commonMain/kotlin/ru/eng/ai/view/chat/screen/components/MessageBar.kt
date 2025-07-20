@@ -37,6 +37,7 @@ import engai.composeapp.generated.resources.Res
 import engai.composeapp.generated.resources.enter_message
 import engai.composeapp.generated.resources.ic_chevron_left
 import engai.composeapp.generated.resources.ic_send
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.tool.keyboardAsState
@@ -44,7 +45,7 @@ import ru.eng.ai.view.theme.EngTheme
 
 @Composable
 fun MessageBar(
-    fastReplyOptions: List<String>,
+    fastReplyOptions: List<StringResource>,
     isSendingAllowed: Boolean,
     onSendMessage: (String) -> Unit,
 ) {
@@ -96,9 +97,9 @@ fun MessageBar(
                 fastReplyOptions.forEach { text ->
                     FastReplyButton(
                         modifier = Modifier.fillMaxWidth(),
-                        replyText = text,
-                        onClick = {
-                            onSendMessage(text)
+                        replyTextResource = text,
+                        onClick = { replyText ->
+                            onSendMessage(replyText)
                             isReplyOptionsVisible = false
                         }
                     )
@@ -213,9 +214,11 @@ private fun ToggleFastReplyButton(
 @Composable
 private fun FastReplyButton(
     modifier: Modifier = Modifier,
-    replyText: String,
-    onClick: () -> Unit
+    replyTextResource: StringResource,
+    onClick: (String) -> Unit
 ) {
+    val replyText = stringResource(replyTextResource)
+
     Box(
         modifier = modifier
             .background(
@@ -226,7 +229,7 @@ private fun FastReplyButton(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = onClick
+                onClick = { onClick(replyText) }
             ),
         contentAlignment = Alignment.Center
     ) {

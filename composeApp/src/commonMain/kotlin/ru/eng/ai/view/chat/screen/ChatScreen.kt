@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.getString
 import ru.eng.ai.model.Message
+import ru.eng.ai.view.chat.screen.bottomsheet.FeedbackBottomSheet
 import ru.eng.ai.view.chat.screen.components.ChatTopBar
 import ru.eng.ai.view.chat.screen.components.MessageBar
 import ru.eng.ai.view.chat.screen.components.MessageItem
@@ -61,9 +62,9 @@ private fun Screen(
     sideEffect: ChatEffect,
     onIntent: (ChatAction) -> Unit
 ) {
-    var characterChangeBottomSheetExpanded by remember {
-        mutableStateOf(false)
-    }
+    var characterChangeBottomSheetExpanded by remember { mutableStateOf(false) }
+    var feedbackBottomSheetExpanded by remember { mutableStateOf(false) }
+
     val pinnedMessagesBarEnabled = remember(state.messages) {
         state.messages.any { it.isPinned }
     }
@@ -114,7 +115,14 @@ private fun Screen(
         SelectCharacterBottomSheet(
             selected = state.selectedCharacter,
             onDismiss = { characterChangeBottomSheetExpanded = false },
-            onSelect = { onIntent.invoke(ChatAction.SelectCharacter(it)) }
+            onSelect = { onIntent.invoke(ChatAction.SelectCharacter(it)) },
+            onClickFeedback = { feedbackBottomSheetExpanded = true }
+        )
+    }
+
+    if (feedbackBottomSheetExpanded) {
+        FeedbackBottomSheet(
+            onDismiss = { feedbackBottomSheetExpanded = false }
         )
     }
 

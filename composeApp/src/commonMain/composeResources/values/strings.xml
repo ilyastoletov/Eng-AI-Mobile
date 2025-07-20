@@ -16,16 +16,31 @@
     <string name="error_connection_lost">Потеряно соединение с сервером.\nПовторное подключение...</string>
     <string name="error_limit_exceeded">Превышен лимит отправки сообщений.\nВозвращайтесь через 24 часа</string>
     <string name="error_server_connection">Ошибка соединения с сервером: %s</string>
+    <string name="you">Вы</string>
+    <string name="character">Персонаж</string>
+    <string name="feedback_title">Проблемы в работе приложения?\n</string>
+    <string name="feedback_subtitle">Написать разработчику</string>
+    <string name="feedback_text">Контакты разработчика eng.ai:\n\nИлья Столетов\nTelegram: @risely\nE-mail: ilastoletov7@gmail.com</string>
 
     <!-- Characters -->
     <string name="traveler_name">Грегори</string>
     <string name="traveler_short_description">Путешественник</string>
     <string name="traveler_description">Любознательный и активный путешественник. Побывал во многих странах и с удовольствием расскажет о культуре и особенности языка каждой из стран.</string>
+    <string name="traveler_fast_reply_first">Hey there! What is your favorite country?</string>
+    <string name="traveler_fast_reply_second">Hello! What can we talk about?</string>
+
     <string name="professor_name">Бренда</string>
     <string name="professor_short_description">Учитель Английского</string>
     <string name="professor_description">Бренда Дейвис профессор лингвистики в университете Оксфорда. Специалист по английскому языку, она поможет вам практиковать и лексику, и грамматику.</string>
+    <string name="professor_fast_reply_first">How can I improve my English skills?</string>
+    <string name="professor_fast_reply_second">Hello! Is it interesting to be English teacher?</string>
+
     <string name="native_speaker_name">Тайлер</string>
     <string name="native_speaker_short_description">Носитель языка</string>
     <string name="native_speaker_description">Дружелюбный житель Калифорнии, любит общатся с иностранцами. Может поговорить с вами на тему любимых увлечений, да и в целом о жизни.</string>
+    <string name="native_speaker_fast_reply_first">Hi! Do you have any hobbies?</string>
+    <string name="native_speaker_fast_reply_second">What did you eat for breakfast today?</string>
 
+    <string name="grammar_check">Grammar Check</string>
+    <string name="spelling_check">Spelling Check</string>
 </resources>

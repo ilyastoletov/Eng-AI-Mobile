@@ -26,6 +26,7 @@ import engai.composeapp.generated.resources.ic_info
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.model.Character
+import ru.eng.ai.tool.Logger
 import ru.eng.ai.view.chat.screen.bottomsheet.CharacterInfoBottomSheet
 import ru.eng.ai.view.chat.viewmodel.enumeration.ChatStatus
 import ru.eng.ai.view.shared.Avatar
@@ -81,17 +82,11 @@ fun ChatTopBar(
                 Spacer(
                     modifier = Modifier.height(4.dp)
                 )
-                if (chatStatus == ChatStatus.NONE) {
-                    Text(
-                        text = stringResource(character.shortDescriptionResource),
-                        style = EngTheme.typography.semiBold12,
-                        color = EngTheme.colors.dimTertiary
-                    )
-                } else {
-                    ChatStatusIndicator(
-                        currentStatus = chatStatus
-                    )
-                }
+                Logger.d("CHAT", "Status: $chatStatus")
+                ChatStatusIndicator(
+                    currentStatus = chatStatus,
+                    characterName = character.shortDescriptionResource
+                )
             }
         }
 

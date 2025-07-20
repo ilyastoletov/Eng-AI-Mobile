@@ -22,6 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
+import engai.composeapp.generated.resources.Res
+import engai.composeapp.generated.resources.character
+import engai.composeapp.generated.resources.pinned_messages
+import engai.composeapp.generated.resources.you
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.model.Message
 import ru.eng.ai.view.theme.EngTheme
 
@@ -48,7 +53,7 @@ fun PinnedMessagesBottomSheet(
         ) {
             item {
                 Text(
-                    text = "Закреплённые сообщения",
+                    text = stringResource(Res.string.pinned_messages),
                     style = EngTheme.typography.semiBold16,
                     color = EngTheme.colors.dimSecondary
                 )
@@ -98,7 +103,9 @@ private fun PinnedMessage(
                 modifier = Modifier.width(12.dp)
             )
             Text(
-                text = if (isOwn) "Вы" else "Персонаж",
+                text = stringResource(
+                    resource = if (isOwn) Res.string.you else Res.string.character
+                ),
                 style = EngTheme.typography.medium12,
                 color = EngTheme.colors.dimSecondary
                     .copy(alpha = 0.4f)
