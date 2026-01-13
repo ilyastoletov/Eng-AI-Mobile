@@ -50,10 +50,10 @@ sealed class Character(
         )
     )
 
-    companion object {
-        val languageCheckFastReplies = listOf(
-            Res.string.grammar_check,
-            Res.string.spelling_check
-        )
-    }
+//    companion object {
+//        val languageCheckFastReplies = listOf(
+//            Res.string.grammar_check,
+//            Res.string.spelling_check
+//        )
+//    }
 }

@@ -29,7 +29,7 @@ fun FeedbackBottomSheet(onDismiss: () -> Unit) {
                 .padding(horizontal = 30.dp)
                 .padding(
                     top = 20.dp,
-                    bottom = 60.dp
+                    bottom = 30.dp
                 )
         ) {
             Text(

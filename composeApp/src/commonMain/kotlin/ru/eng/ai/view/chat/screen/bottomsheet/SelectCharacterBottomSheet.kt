@@ -71,7 +71,7 @@ fun SelectCharacterBottomSheet(
             onClick = onClickFeedback
         )
         Spacer(
-            modifier = Modifier.height(60.dp)
+            modifier = Modifier.height(30.dp)
         )
     }
 

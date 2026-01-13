@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.compose.resources.StringResource
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -22,12 +21,11 @@ import ru.eng.ai.exception.ChatClosedException
 import ru.eng.ai.exception.MessageLimitReachedException
 import ru.eng.ai.model.Character
 import ru.eng.ai.model.Message
-import ru.eng.ai.tool.Logger
 import ru.eng.ai.tool.copyText
 import ru.eng.ai.tool.getDeviceIdentifier
 import ru.eng.ai.view.chat.viewmodel.enumeration.ChatStatus
 
-private const val SESSION_RESTART_TIMEOUT = 5000L
+private const val SESSION_RESTART_TIMEOUT = 1000L
 
 class ChatViewModel(
     private val userRepository: UserRepository,
@@ -107,7 +105,7 @@ class ChatViewModel(
                 if (messages.isNotEmpty()) {
                     state.copy(
                         messages = messages,
-                        fastReplyOptions = Character.languageCheckFastReplies
+                        // fastReplyOptions = Character.languageCheckFastReplies
                     )
                 } else {
                     state.copy(
@@ -133,7 +131,8 @@ class ChatViewModel(
             val fastReplies = if (savedMessages.isEmpty()) {
                 newCharacter.fastReplies
             } else {
-                Character.languageCheckFastReplies
+                emptyList()
+                // Character.languageCheckFastReplies
             }
 
             reduce {
@@ -182,7 +181,6 @@ class ChatViewModel(
                     )
                 },
                 onFailure = { error ->
-                    Logger.d("ERROR", "$error ${error.message}")
                     postSideEffect(
                         sideEffect = ChatEffect.ShowSnackbar(
                             messageResource = Res.string.error_server_connection,
@@ -199,22 +197,24 @@ class ChatViewModel(
             mutableMessages.add(message)
             state.copy(
                 messages = mutableMessages,
-                fastReplyOptions = Character.languageCheckFastReplies,
-                chatStatus = status
+                chatStatus = status,
+                // fastReplyOptions = Character.languageCheckFastReplies
             )
         }
     }
 
-    private suspend fun Syntax<ChatState, ChatEffect>.handleChatError(error: Throwable) {
-        val message: StringResource
+    private suspend fun Syntax<ChatState, ChatEffect>.handleChatError(error: Throwable) =
         when(error) {
             is ChatClosedException -> {
-                message = Res.string.error_connection_lost
                 waitAndRestartSession()
                 reduce { state.copy(chatStatus = ChatStatus.RECONNECT) }
             }
             is MessageLimitReachedException -> {
-                message = Res.string.error_limit_exceeded
+                postSideEffect(
+                    ChatEffect.ShowSnackbar(
+                        messageResource = Res.string.error_limit_exceeded
+                    )
+                )
             }
             else -> {
                 reduce { state.copy(chatStatus = ChatStatus.ERROR) }
@@ -224,11 +224,9 @@ class ChatViewModel(
                         formatArg = error.message.orEmpty()
                     )
                 )
-                return
             }
         }
-        postSideEffect(ChatEffect.ShowSnackbar(message))
-    }
+
 
     private fun waitAndRestartSession() {
         viewModelScope.launch {
