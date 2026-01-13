@@ -21,6 +21,11 @@
     <string name="feedback_title">Experiencing any issues with application?\n</string>
     <string name="feedback_subtitle">Contact developer</string>
     <string name="feedback_text">eng.ai developer contacts:\n\nIlya Stoletov\nTelegram: @risely\nE-mail: ilastoletov7@gmail.com</string>
+    <string name="chat_delete_dialog_title">Delete chat</string>
+    <string name="chat_delete_dialog_text">Are you sure you want to clear chat history with that character?</string>
+    <string name="chat_delete_confirm">Delete</string>
+    <string name="chat_delete_decline">Cancel</string>
+    <string name="chat_delete_success">Chat history cleared</string>
 
     <!-- Characters -->
     <string name="traveler_name">Gregory</string>
@@ -32,5 +37,4 @@
     <string name="native_speaker_name">Tayler</string>
     <string name="native_speaker_short_description">Native Speaker</string>
     <string name="native_speaker_description">Friendly Californian, likes to socialize with foreigners. He can talk to you about your favorite hobbies and about life in general.</string>
-
 </resources>

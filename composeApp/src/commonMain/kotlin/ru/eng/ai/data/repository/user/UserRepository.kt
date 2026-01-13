@@ -26,9 +26,9 @@ internal class UserRepositoryImpl(
         }
 
         val loginRequest = deviceId.toLoginRequest()
-        val registrationResult = tryRetrieveUserToken("register", loginRequest)
+        val registrationResult = tryRetrieveUserToken(endpoint = "register", loginRequest)
         val authTokenResult = if (registrationResult.isFailure) {
-            tryRetrieveUserToken("login", loginRequest)
+            tryRetrieveUserToken(endpoint = "login", loginRequest)
         } else registrationResult
         authTokenResult.onSuccess { authToken ->
             tokenDao.insertToken(TokenEntity(token = authToken))

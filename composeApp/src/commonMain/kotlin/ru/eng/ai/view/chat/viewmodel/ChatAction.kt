@@ -9,4 +9,5 @@ sealed interface ChatAction {
     data class SendMessage(val text: String) : ChatAction
     data class CopyMessageText(val text: String) : ChatAction
     data class PinMessage(val messageId: String,) : ChatAction
+    data object ClearChatHistory : ChatAction
 }

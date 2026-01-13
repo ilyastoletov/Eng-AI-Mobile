@@ -34,6 +34,7 @@ import engai.composeapp.generated.resources.ic_copy
 import engai.composeapp.generated.resources.ic_pin
 import engai.composeapp.generated.resources.ic_pin_filled
 import engai.composeapp.generated.resources.menu_copy
+import engai.composeapp.generated.resources.ic_clock
 import engai.composeapp.generated.resources.menu_pin
 import engai.composeapp.generated.resources.menu_unpin
 import org.jetbrains.compose.resources.DrawableResource
@@ -48,6 +49,7 @@ fun MessageItem(
     isOwn: Boolean,
     sendingTime: String,
     isPinned: Boolean,
+    isUndelivered: Boolean,
     onCopy: () -> Unit,
     onPin: () -> Unit
 ) {
@@ -109,6 +111,17 @@ fun MessageItem(
                 )
                 Icon(
                     painter = painterResource(Res.drawable.ic_pin_filled),
+                    contentDescription = null,
+                    tint = EngTheme.colors.secondary,
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+            if (isUndelivered) {
+                Spacer(
+                    modifier = Modifier.width(6.dp)
+                )
+                Icon(
+                    painter = painterResource(Res.drawable.ic_clock),
                     contentDescription = null,
                     tint = EngTheme.colors.secondary,
                     modifier = Modifier.size(12.dp)

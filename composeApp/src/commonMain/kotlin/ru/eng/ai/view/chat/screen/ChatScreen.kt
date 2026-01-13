@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,7 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import engai.composeapp.generated.resources.Res
+import engai.composeapp.generated.resources.chat_delete_confirm
+import engai.composeapp.generated.resources.chat_delete_decline
+import engai.composeapp.generated.resources.chat_delete_dialog_text
+import engai.composeapp.generated.resources.chat_delete_dialog_title
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import ru.eng.ai.model.Message
 import ru.eng.ai.view.chat.screen.bottomsheet.FeedbackBottomSheet
 import ru.eng.ai.view.chat.screen.components.ChatTopBar
@@ -64,6 +73,7 @@ private fun Screen(
 ) {
     var characterChangeBottomSheetExpanded by remember { mutableStateOf(false) }
     var feedbackBottomSheetExpanded by remember { mutableStateOf(false) }
+    var clearChatConfirmationDialogShown by remember { mutableStateOf(false) }
 
     val pinnedMessagesBarEnabled = remember(state.messages) {
         state.messages.any { it.isPinned }
@@ -73,6 +83,7 @@ private fun Screen(
 
     Scaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.ime),
+        containerColor = EngTheme.colors.primaryVariant,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column {
@@ -80,6 +91,7 @@ private fun Screen(
                     character = state.selectedCharacter,
                     chatStatus = state.chatStatus,
                     onClickChangeCharacter = { characterChangeBottomSheetExpanded = true },
+                    onClickClearChatHistory = { clearChatConfirmationDialogShown = true }
                 )
                 if (pinnedMessagesBarEnabled) {
                     PinnedMessagesBar(
@@ -98,8 +110,7 @@ private fun Screen(
             } else {
                 LimitReachedNotice()
             }
-        },
-        backgroundColor = EngTheme.colors.primaryVariant
+        }
     ) { scaffoldPadding ->
         MessagesList(
             modifier = Modifier
@@ -123,6 +134,16 @@ private fun Screen(
     if (feedbackBottomSheetExpanded) {
         FeedbackBottomSheet(
             onDismiss = { feedbackBottomSheetExpanded = false }
+        )
+    }
+
+    if (clearChatConfirmationDialogShown) {
+        DeleteChatDialog(
+            onConfirm = {
+                onIntent(ChatAction.ClearChatHistory)
+                clearChatConfirmationDialogShown = false
+            },
+            onDismiss = { clearChatConfirmationDialogShown = false }
         )
     }
 
@@ -172,9 +193,48 @@ private fun MessagesList(
                 sendingTime = item.sendingTime,
                 isOwn = item.isOwn,
                 isPinned = item.isPinned,
+                isUndelivered = item.isUndelivered,
                 onCopy = { onCopyMessage(item.text) },
                 onPin = { onPinMessage(item.id) }
             )
         }
     }
+}
+
+@Composable
+private fun DeleteChatDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(Res.string.chat_delete_dialog_title)
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(Res.string.chat_delete_dialog_text)
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm
+            ) {
+                Text(
+                    text = stringResource(Res.string.chat_delete_confirm)
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text(
+                    text = stringResource(Res.string.chat_delete_decline)
+                )
+            }
+        }
+    )
 }

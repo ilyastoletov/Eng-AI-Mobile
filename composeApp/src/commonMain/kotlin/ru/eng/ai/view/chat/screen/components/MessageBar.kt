@@ -17,8 +17,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,14 +28,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import engai.composeapp.generated.resources.Res
 import engai.composeapp.generated.resources.enter_message
-import engai.composeapp.generated.resources.ic_chevron_left
+import engai.composeapp.generated.resources.ic_close
+import engai.composeapp.generated.resources.ic_menu
 import engai.composeapp.generated.resources.ic_send
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -98,6 +98,7 @@ fun MessageBar(
                     FastReplyButton(
                         modifier = Modifier.fillMaxWidth(),
                         replyTextResource = text,
+                        isEnabled = isSendingAllowed,
                         onClick = { replyText ->
                             onSendMessage(replyText)
                             isReplyOptionsVisible = false
@@ -150,7 +151,7 @@ private fun MessageTextField(
                             bottom = 6.dp,
                             top = 6.dp
                         ),
-                    open = isFastReplyOpen,
+                    isOpen = isFastReplyOpen,
                     onClick = onToggleFastReply
                 )
             }
@@ -184,9 +185,17 @@ private fun MessageTextField(
 @Composable
 private fun ToggleFastReplyButton(
     modifier: Modifier,
-    open: Boolean,
+    isOpen: Boolean,
     onClick: () -> Unit
 ) {
+    val iconResource = remember(isOpen) {
+        if (isOpen) {
+            Res.drawable.ic_close
+        } else {
+            Res.drawable.ic_menu
+        }
+    }
+
     Box(
         modifier = modifier
             .size(36.dp)
@@ -201,13 +210,13 @@ private fun ToggleFastReplyButton(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            painter = painterResource(Res.drawable.ic_chevron_left),
-            tint = EngTheme.colors.dimSecondary,
-            contentDescription = null,
-            modifier = Modifier
-                .rotate(degrees = if (open) 90f else -90f)
-        )
+        Box(modifier = Modifier.size(20.dp)) {
+            Icon(
+                painter = painterResource(iconResource),
+                tint = EngTheme.colors.dimSecondary,
+                contentDescription = null,
+            )
+        }
     }
 }
 
@@ -215,12 +224,15 @@ private fun ToggleFastReplyButton(
 private fun FastReplyButton(
     modifier: Modifier = Modifier,
     replyTextResource: StringResource,
+    isEnabled: Boolean,
     onClick: (String) -> Unit
 ) {
+    val buttonAlpha = remember(isEnabled) { if (isEnabled) 1.0F else 0.6F }
     val replyText = stringResource(replyTextResource)
 
     Box(
         modifier = modifier
+            .alpha(buttonAlpha)
             .background(
                 color = EngTheme.colors.secondary,
                 shape = RoundedCornerShape(12.dp)
@@ -229,7 +241,7 @@ private fun FastReplyButton(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = { onClick(replyText) }
+                onClick = { if (isEnabled) onClick(replyText) }
             ),
         contentAlignment = Alignment.Center
     ) {

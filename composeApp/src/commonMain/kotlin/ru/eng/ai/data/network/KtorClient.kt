@@ -11,6 +11,7 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
@@ -43,6 +44,9 @@ internal class KtorClient {
 
     suspend fun post(url: String, block: HttpRequestBuilder.() -> Unit): Result<HttpResponse> =
         runCatching { client.post(url, block) }
+
+    suspend fun delete(url: String, block: HttpRequestBuilder.() -> Unit): Result<HttpResponse> =
+        runCatching { client.delete(url, block) }
 
     suspend fun openWebsocketSession(urlString: String): DefaultClientWebSocketSession =
         client.webSocketSession(urlString = urlString)

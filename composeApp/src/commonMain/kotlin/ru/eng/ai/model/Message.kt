@@ -5,5 +5,6 @@ data class Message(
     val text: String,
     val sendingTime: String,
     val isOwn: Boolean,
-    val isPinned: Boolean = false
+    val isPinned: Boolean = false,
+    val isUndelivered: Boolean = false,
 )

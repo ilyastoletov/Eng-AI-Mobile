@@ -7,6 +7,8 @@ import ru.eng.ai.data.network.KtorClient
 import ru.eng.ai.data.network.WebSocketSession
 import ru.eng.ai.data.repository.chat.ChatRepository
 import ru.eng.ai.data.repository.chat.ChatRepositoryImpl
+import ru.eng.ai.data.repository.chat.remote.ChatRemoteDataSource
+import ru.eng.ai.data.repository.chat.remote.ChatRemoteDataSourceImpl
 import ru.eng.ai.data.repository.chat.storage.MessageLimitController
 import ru.eng.ai.data.repository.chat.storage.MessageLimitControllerImpl
 import ru.eng.ai.data.repository.chat.ws.ChatWebsocketSession
@@ -36,6 +38,7 @@ val DataModule = DI.Module(name = "data") {
     bindSingleton<TokenDao> { instance<EngAppDatabase>().getTokenDao() }
     bindSingleton<MessageDao> { instance<EngAppDatabase>().getMessagesDao() }
     bindSingleton<MessageLimitController> { MessageLimitControllerImpl(dataStoreClient = instance()) }
+    bindSingleton<ChatRemoteDataSource> { ChatRemoteDataSourceImpl(ktorClient = instance()) }
 
     bindSingleton<UserRepository> {
         UserRepositoryImpl(
@@ -48,7 +51,8 @@ val DataModule = DI.Module(name = "data") {
             tokenDao = instance(),
             messagesDao = instance(),
             webSocketSession = instance(),
-            messageLimitController = instance()
+            messageLimitController = instance(),
+            remoteDataSource = instance()
         )
     }
 }

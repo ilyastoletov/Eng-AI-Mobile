@@ -24,6 +24,9 @@ interface MessageDao {
     @Query("UPDATE messages SET is_pinned = :newValue WHERE id = :messageId")
     suspend fun setIsPinnedOnMessageById(messageId: String, newValue: Boolean)
 
+    @Query("DELETE FROM messages WHERE character_name = :character")
+    suspend fun deleteMessagesByCharacter(character: String)
+
     @Transaction
     suspend fun togglePinOnMessage(messageId: String) {
         val messageEntity = getMessageById(messageId) ?: return

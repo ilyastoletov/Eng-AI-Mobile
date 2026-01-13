@@ -21,12 +21,17 @@
     <string name="feedback_title">Проблемы в работе приложения?\n</string>
     <string name="feedback_subtitle">Написать разработчику</string>
     <string name="feedback_text">Контакты разработчика eng.ai:\n\nИлья Столетов\nTelegram: @risely\nE-mail: ilastoletov7@gmail.com</string>
+    <string name="chat_delete_dialog_title">Удаление чата</string>
+    <string name="chat_delete_dialog_text">Вы уверены что хотите удалить историю общения с этим персонажем?</string>
+    <string name="chat_delete_confirm">Удалить</string>
+    <string name="chat_delete_decline">Отмена</string>
+    <string name="chat_delete_success">История сообщений очищена</string>
 
     <!-- Characters -->
     <string name="traveler_name">Грегори</string>
     <string name="traveler_short_description">Путешественник</string>
     <string name="traveler_description">Любознательный и активный путешественник. Побывал во многих странах и с удовольствием расскажет о культуре и особенности языка каждой из стран.</string>
-    <string name="traveler_fast_reply_first">Hello! What's your name? Who are you?</string>
+    <string name="traveler_fast_reply_first">Hello! What can we chat about?</string>
     <string name="traveler_fast_reply_second">What was your best trip?</string>
 
     <string name="professor_name">Бренда</string>

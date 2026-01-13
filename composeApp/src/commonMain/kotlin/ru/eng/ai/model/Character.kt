@@ -10,6 +10,7 @@ sealed class Character(
     val shortDescriptionResource: StringResource,
     val descriptionResource: StringResource,
     val avatarResource: DrawableResource,
+    val internalName: String,
     val fastReplies: List<StringResource>,
 ) {
 
@@ -18,6 +19,7 @@ sealed class Character(
         shortDescriptionResource = Res.string.traveler_short_description,
         descriptionResource = Res.string.traveler_description,
         avatarResource = Res.drawable.traveler_avatar,
+        internalName = "traveler",
         fastReplies = listOf(
             Res.string.traveler_fast_reply_first,
             Res.string.traveler_fast_reply_second
@@ -29,6 +31,7 @@ sealed class Character(
         shortDescriptionResource = Res.string.professor_short_description,
         descriptionResource = Res.string.professor_description,
         avatarResource = Res.drawable.scientist_avatar,
+        internalName = "professor",
         fastReplies = listOf(
             Res.string.professor_fast_reply_first,
             Res.string.professor_fast_reply_second
@@ -40,6 +43,7 @@ sealed class Character(
         shortDescriptionResource = Res.string.native_speaker_short_description,
         descriptionResource = Res.string.native_speaker_description,
         avatarResource = Res.drawable.native_speaker_avatar,
+        internalName = "native_speaker",
         fastReplies = listOf(
             Res.string.native_speaker_fast_reply_first,
             Res.string.native_speaker_fast_reply_second
